@@ -3,6 +3,7 @@ import os
 import shutil
 import markdown
 from markdown.extensions.toc import TocExtension
+from markdown.extensions.fenced_code import FencedCodeExtension
 from .utils import load_template, extract_title_and_headers
 
 def convert_md_to_html(md_file_path, output_dir=None, template_path=None, custom_css_path=None, title="Documentation"):
@@ -29,11 +30,11 @@ def convert_md_to_html(md_file_path, output_dir=None, template_path=None, custom
     # Use provided title if given, otherwise use extracted title
     page_title = title or md_title
 
-    # Convert Markdown to HTML with the table extension and TOC extension
-    html_content = markdown.markdown(md_content, extensions=['tables', TocExtension(anchorlink=True, slugify=markdown.extensions.toc.slugify_unicode)])
+    # Convert Markdown to HTML with the table extension, TOC extension, and fenced code extension
+    html_content = markdown.markdown(md_content, extensions=['tables', TocExtension(anchorlink=True, slugify=markdown.extensions.toc.slugify_unicode), FencedCodeExtension()])
 
     # Load the HTML template
-    template = load_template(template_path or 'index_template')
+    template = load_template(template_path or 'index.html')
 
     # Add custom CSS link if provided
     custom_css_link = f'<link rel="stylesheet" href="{os.path.basename(custom_css_path)}">' if custom_css_path else ''

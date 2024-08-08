@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <!-- Link to custom font -->
+    <style>
+        @font-face {
+            font-family: 'FontAwesome';
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/webfonts/fa-solid-400.ttf') format('truetype');
+        }
+    </style>
+    <!-- Custom CSS Link -->
+    {{ custom_css }}
+    <style>
+        body {
+            font-family: 'FontAwesome', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #444;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        h1, h2, h3 {
+            color: #FF0043;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+        p {
+            line-height: 1.6;
+            margin-bottom: 1em;
+        }
+        code {
+            background-color: #e8e8e8;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+        pre {
+            background-color: #e8e8e8;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 0.95em;
+            position: relative;
+        }
+        pre code {
+            display: block;
+            white-space: pre;
+        }
+        .copy-button {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: #FF0043;
+            border: none;
+            border-radius: 4px;
+            padding: 5px;
+            cursor: pointer;
+            color: white;
+            font-size: 0.9em;
+        }
+        .copy-button:active {
+            transform: scale(0.95);
+        }
+        a {
+            color: #FF0043;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .navbar {
+            background-color: #FF0043;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            width: 100%;
+            height: 30px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .content-wrapper {
+            display: flex;
+            flex: 1;
+            margin-top: 50px;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: 250px;
+            background: #343a40;
+            color: white;
+            padding: 10px;
+            height: calc(100vh - 50px);
+            overflow-y: auto;
+            position: fixed;
+            top: 50px;
+            left: 0;
+            z-index: 999;
+            box-sizing: border-box;
+            transition: transform 0.3s ease;
+        }
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            transition: background 0.3s ease;
+        }
+        .sidebar ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .sidebar ul li.sub-header {
+            margin-left: 20px;
+        }
+        .sidebar ul li.sub-sub-header {
+            margin-left: 40px;
+        }
+        .container {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #FF0043;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f0f2f5;
+        }
+        tr:hover {
+            background-color: #e1e1e1;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #343a40;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FF0043;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .container {
+                margin-left: 0;
+                padding: 10px;
+            }
+            .content-wrapper {
+                flex-direction: column;
+            }
+            table {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            th, td {
+                white-space: nowrap;
+            }
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('pre code').forEach((block) => {
+                const button = document.createElement('button');
+                button.className = 'copy-button';
+                button.innerHTML = 'Copy';
+                button.addEventListener('click', () => {
+                    const text = block.innerText;
+                    navigator.clipboard.writeText(text).then(() => {
+                        button.innerHTML = 'Copied';
+                        setTimeout(() => {
+                            button.innerHTML = 'Copy';
+                        }, 2000);
+                    });
+                });
+                block.parentElement.appendChild(button);
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="navbar">
+        {{ navbar_title }}
+    </div>
+    <div class="content-wrapper">
+        <div class="sidebar">
+            {{ sidebar }}
+        </div>
+        <div class="container">
+            {{ content }}
+        </div>
+    </div>
+</body>
+</html>

@@ -10,7 +10,7 @@ def load_template(template_name):
     :param template_name: Name of the template file (without extension).
     :return: Template content as a string.
     """
-    template_path = os.path.join(os.path.dirname(__file__), 'templates', f'{template_name}.html')
+    template_path = os.path.join(os.path.dirname(__file__), 'templates', f'{template_name}')
 
     if not os.path.exists(template_path):
         raise FileNotFoundError(f"Template {template_name} not found.")
