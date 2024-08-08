@@ -58,7 +58,7 @@ md2indexhtml path/to/yourfile.md path/to/output/dir --template path/to/template.
 md2indexhtml README.md output --title "Default Theme"
 ```
 
-![Default](screenshots/index.jpg)
+![Default](https://raw.githubusercontent.com/fasilwdr/md2indexhtml/main/screenshots/index.jpg)
 
 ### GoDocs Theme
 
@@ -66,7 +66,7 @@ md2indexhtml README.md output --title "Default Theme"
 md2indexhtml README.md output --title "GoDocs Theme" --template godocs.html
 ```
 
-![GoDocs](screenshots/godocs.jpg)
+![GoDocs](https://raw.githubusercontent.com/fasilwdr/md2indexhtml/main/screenshots/godocs.jpg)
 
 ### DocBox Theme
 
@@ -74,7 +74,7 @@ md2indexhtml README.md output --title "GoDocs Theme" --template godocs.html
 md2indexhtml README.md output --title "DocBox Theme" --template docbox.html 
 ```
 
-![GoDocs](screenshots/docbox.jpg)
+![GoDocs](https://raw.githubusercontent.com/fasilwdr/md2indexhtml/main/screenshots/docbox.jpg)
 
 # Python API
 
