@@ -1,11 +1,10 @@
 <!-- md2indexhtml/templates/index_template.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Documentation</title>
+    <title>{{ title }}</title>
     <!-- Link to IBM Plex Mono font from Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Custom CSS Link -->
@@ -14,9 +13,12 @@
         body {
             font-family: 'IBM Plex Mono', monospace;
             margin: 0;
-            padding: 20px;
-            background-color: #f8f9fa; /* Light background */
+            padding: 0;
+            background-color: #343a40;
             color: #212529; /* Dark text */
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
         h1, h2, h3 {
             color: #343a40; /* Darker headings */
@@ -47,23 +49,87 @@
         a:hover {
             text-decoration: underline;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
         .navbar {
             background-color: #343a40;
             color: white;
             padding: 10px;
             text-align: center;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        .content-wrapper {
+            display: flex;
+            flex: 1;
+            margin-top: 50px;
+        }
+        .sidebar {
+            width: 200px;
+            background-color: #343a40;
+            color: white;
+            padding: 10px;
+            height: calc(100vh - 50px);
+            overflow-y: auto;
+            position: fixed;
+            top: 50px;
+            left: 0;
+            z-index: 999;
+            box-sizing: border-box;
+        }
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        .sidebar ul li a:hover {
+            text-decoration: underline;
+        }
+        .sidebar ul li.sub-header {
+            margin-left: 10px;
+        }
+        .sidebar ul li.sub-sub-header {
+            margin-left: 20px;
+        }
+        .container {
+            flex: 1;
+            margin-left: 220px;
+            padding: 10px;
+            background-color: #f8f9fa;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                top: 0;
+                left: 0;
+            }
+            .container {
+                margin-left: 0;
+                padding: 10px;
+            }
+            .content-wrapper {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <div class="navbar">Documentation</div>
-    <div class="container">
-        {{ content }}
+    <div class="content-wrapper">
+        {{ sidebar }}
+        <div class="container">
+            {{ content }}
+        </div>
     </div>
 </body>
 </html>

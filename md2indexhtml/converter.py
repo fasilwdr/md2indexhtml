@@ -1,10 +1,9 @@
-# md2indexhtml/converter.py
-
 import argparse
 import os
-import shutil  # Import shutil for file operations
+import shutil
 import markdown
-from .utils import load_template
+from markdown.extensions.toc import TocExtension
+from .utils import load_template, extract_title_and_headers
 
 def convert_md_to_html(md_file_path, output_dir, template_path=None, custom_css_path=None):
     """
@@ -19,8 +18,11 @@ def convert_md_to_html(md_file_path, output_dir, template_path=None, custom_css_
     with open(md_file_path, 'r', encoding='utf-8') as md_file:
         md_content = md_file.read()
 
-    # Convert Markdown to HTML with the table extension
-    html_content = markdown.markdown(md_content, extensions=['tables'])
+    # Extract title and headers
+    title, headers_html = extract_title_and_headers(md_content)
+
+    # Convert Markdown to HTML with the table extension and TOC extension
+    html_content = markdown.markdown(md_content, extensions=['tables', TocExtension(anchorlink=True, slugify=markdown.extensions.toc.slugify_unicode)])
 
     # Load the HTML template
     template = load_template(template_path or 'index_template')
@@ -29,7 +31,7 @@ def convert_md_to_html(md_file_path, output_dir, template_path=None, custom_css_
     custom_css_link = f'<link rel="stylesheet" href="{os.path.basename(custom_css_path)}">' if custom_css_path else ''
 
     # Combine the template and the HTML content
-    html_output = template.replace('{{ content }}', html_content).replace('{{ custom_css }}', custom_css_link)
+    html_output = template.replace('{{ title }}', title).replace('{{ sidebar }}', headers_html).replace('{{ content }}', html_content).replace('{{ custom_css }}', custom_css_link)
 
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
