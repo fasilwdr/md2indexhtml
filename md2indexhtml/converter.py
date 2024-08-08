@@ -6,6 +6,7 @@ from markdown.extensions.toc import TocExtension
 from markdown.extensions.fenced_code import FencedCodeExtension
 from .utils import load_template, extract_title_and_headers
 
+
 def convert_md_to_html(md_file_path, output_dir=None, template_path=None, custom_css_path=None, title="Documentation"):
     """
     Convert a Markdown file to an HTML file using a specified template and optional custom CSS.
@@ -65,6 +66,7 @@ def convert_md_to_html(md_file_path, output_dir=None, template_path=None, custom
 
     print(f"Converted {md_file_path} to {output_path}")
 
+
 def main():
     # Set up argument parsing
     parser = argparse.ArgumentParser(description='Convert a Markdown file to an HTML file.')
@@ -79,6 +81,7 @@ def main():
 
     # Call the conversion function with the parsed arguments
     convert_md_to_html(args.md_file_path, args.output_dir, args.template, args.css, args.title)
+
 
 if __name__ == '__main__':
     main()

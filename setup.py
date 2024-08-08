@@ -1,18 +1,22 @@
-# setup.py
 from setuptools import setup, find_packages
+
+
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
 
 setup(
     name='md2indexhtml',
-    version='0.1.1',
+    version='0.1.2',
     description='Convert Markdown files to index.html',
-    author='Your Name',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
+    author='Fasil',
     author_email='fasilwdr@hotmail.com',
     url='https://github.com/fasilwdr/md2indexhtml',
     packages=find_packages(),
     install_requires=[
         'markdown',
     ],
-    readme="README.md",
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',

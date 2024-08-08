@@ -54,13 +54,25 @@ md2indexhtml path/to/yourfile.md path/to/output/dir --template path/to/template.
 
 ### Default Theme
 
+```bash
+md2indexhtml README.md output --title "Default Theme"
+```
+
 ![Default](screenshots/index.jpg)
 
 ### GoDocs Theme
 
+```bash
+md2indexhtml README.md output --title "GoDocs Theme" --template godocs.html
+```
+
 ![GoDocs](screenshots/godocs.jpg)
 
 ### DocBox Theme
+
+```bash
+md2indexhtml README.md output --title "DocBox Theme" --template docbox.html 
+```
 
 ![GoDocs](screenshots/docbox.jpg)
 

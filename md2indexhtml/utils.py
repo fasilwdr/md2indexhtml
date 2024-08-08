@@ -1,7 +1,6 @@
-# md2indexhtml/utils.py
 import os
 import re
-import markdown
+
 
 def load_template(template_name):
     """
@@ -17,6 +16,7 @@ def load_template(template_name):
 
     with open(template_path, 'r', encoding='utf-8') as template_file:
         return template_file.read()
+
 
 def extract_title_and_headers(md_content):
     """
@@ -43,6 +43,7 @@ def extract_title_and_headers(md_content):
     headers_html += "</ul></div>"
 
     return title, headers_html
+
 
 def slugify(value, separator='-'):
     """
