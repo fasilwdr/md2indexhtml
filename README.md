@@ -21,14 +21,6 @@ pip install md2indexhtml
 
 This document provides instructions on how to use the `md2indexhtml` package to convert Markdown files to HTML files.
 
-## Installation
-
-To install the package, run the following command:
-
-```bash
-pip install md2indexhtml
-```
-
 ## Basic Usage
 
 To convert a Markdown file to an HTML file using the default settings, run the following command:
