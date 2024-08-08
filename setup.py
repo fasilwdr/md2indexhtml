@@ -1,5 +1,4 @@
 # setup.py
-
 from setuptools import setup, find_packages
 
 setup(
@@ -25,7 +24,7 @@ setup(
         ],
     },
     package_data={
-        'md2indexhtml': ['templates/*.html'],  # Include all HTML files in the templates directory
+        'md2indexhtml': ['templates/*.html'],
     },
-    include_package_data=True,  # This flag is needed to include the data specified in package_data
+    include_package_data=True,
 )
