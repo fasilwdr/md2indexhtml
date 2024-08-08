@@ -1,0 +1,69 @@
+<!-- md2indexhtml/templates/index_template.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation</title>
+    <!-- Link to IBM Plex Mono font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS Link -->
+    {{ custom_css }}
+    <style>
+        body {
+            font-family: 'IBM Plex Mono', monospace;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa; /* Light background */
+            color: #212529; /* Dark text */
+        }
+        h1, h2, h3 {
+            color: #343a40; /* Darker headings */
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+        p {
+            line-height: 1.6;
+            margin-bottom: 1em;
+        }
+        code {
+            background-color: #e9ecef;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+        pre {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 0.95em;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .navbar {
+            background-color: #343a40;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">Documentation</div>
+    <div class="container">
+        {{ content }}
+    </div>
+</body>
+</html>
