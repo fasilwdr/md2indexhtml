@@ -50,6 +50,20 @@ Example:
 md2indexhtml path/to/yourfile.md path/to/output/dir --template path/to/template.html --css path/to/custom.css --title "My Documentation"
 ```
 
+## Themes
+
+### Default Theme
+
+![Default](screenshots/index.jpg)
+
+### GoDocs Theme
+
+![GoDocs](screenshots/godocs.jpg)
+
+### DocBox Theme
+
+![GoDocs](screenshots/docbox.jpg)
+
 # Python API
 
 You can also use the package programmatically in your Python code:
