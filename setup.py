@@ -7,8 +7,8 @@ setup(
     version='0.1.0',
     description='Convert Markdown files to index.html for Odoo modules',
     author='Your Name',
-    author_email='your.email@example.com',
-    url='https://github.com/yourusername/md2indexhtml',
+    author_email='fasilwdr@hotmail.com',
+    url='https://github.com/fasilwdr/md2indexhtml',
     packages=find_packages(),
     install_requires=[
         'markdown',
