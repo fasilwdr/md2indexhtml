@@ -7,6 +7,9 @@ from markdown.extensions.fenced_code import FencedCodeExtension
 from .utils import load_template, extract_title_and_headers
 
 
+__version__ = "0.1.4"
+
+
 def convert_md_to_html(md_file_path, output_dir=None, template_path=None, custom_css_path=None, title="Documentation"):
     """
     Convert a Markdown file to an HTML file using a specified template and optional custom CSS.
@@ -70,17 +73,21 @@ def convert_md_to_html(md_file_path, output_dir=None, template_path=None, custom
 def main():
     # Set up argument parsing
     parser = argparse.ArgumentParser(description='Convert a Markdown file to an HTML file.')
-    parser.add_argument('md_file_path', type=str, help='Path to the Markdown file.')
+    parser.add_argument('md_file_path', type=str, nargs='?', help='Path to the Markdown file.')
     parser.add_argument('output_dir', type=str, nargs='?', default=None, help='Directory to save the output HTML file (optional).')
     parser.add_argument('--template', type=str, help='Path to the HTML template (optional).')
     parser.add_argument('--css', type=str, help='Path to a custom CSS file (optional).')
     parser.add_argument('--title', type=str, default='Documentation', help='Title for the HTML document and navbar (optional).')
+    parser.add_argument('--version', action='version', version=f'md2indexhtml {__version__}\n[Author: fasilwdr@hotmail.com]', help='Show the version of the package.')
 
     # Parse arguments
     args = parser.parse_args()
 
-    # Call the conversion function with the parsed arguments
-    convert_md_to_html(args.md_file_path, args.output_dir, args.template, args.css, args.title)
+    # If md_file_path is provided, proceed with conversion
+    if args.md_file_path:
+        convert_md_to_html(args.md_file_path, args.output_dir, args.template, args.css, args.title)
+    else:
+        parser.print_usage()
 
 
 if __name__ == '__main__':
