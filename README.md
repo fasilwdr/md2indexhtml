@@ -9,6 +9,7 @@
 - Generates a clean, professional table of contents
 - Applies modern, responsive styling without requiring external CSS
 - Simple command-line interface
+- Flexible output path options
 
 ## Installation
 
@@ -48,6 +49,29 @@ It will automatically:
 2. Convert it to HTML
 3. Save it as `static/description/index.html`
 
+### Custom Output Path
+
+You can specify a custom output path using the `--output` or `-o` argument:
+
+```bash
+md2indexhtml README.md --output /path/to/output/docs.html
+# or use the short form
+md2indexhtml README.md -o /path/to/output/docs.html
+```
+
+This will:
+1. Convert your README.md to HTML
+2. Create the output directory if it doesn't exist
+3. Save the converted file at the specified path
+
+### Custom Title
+
+You can specify a custom title for the HTML document:
+
+```bash
+md2indexhtml README.md --title "My Documentation"
+```
+
 ### Python API
 
 You can also use the package programmatically in your Python code:
@@ -57,6 +81,12 @@ from md2indexhtml import convert_md_to_html
 
 # Convert specific file
 convert_md_to_html("README.md")
+
+# Convert with custom output path
+convert_md_to_html("README.md", output_path="docs/output.html")
+
+# Convert with custom title
+convert_md_to_html("README.md", title="My Documentation")
 
 # Or let it find a markdown file automatically
 convert_md_to_html()

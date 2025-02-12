@@ -1,34 +1,29 @@
 import os
 import sys
+import argparse
 import markdown
 from markdown.extensions.toc import TocExtension
 from .utils import extract_title_and_headers, get_default_styles, apply_styles_to_html
 
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 
 
-def convert_md_to_html(md_file_path=None, title="Documentation"):
+def convert_md_to_html(md_file_path=None, title="Documentation", output_path=None):
     """
     Convert a Markdown file to an HTML file with inline styles.
 
     :param md_file_path: Path to the Markdown file (optional).
-                        If not provided, uses 'static/description/index.html'
+                        If not provided, uses the first .md file in current directory
     :param title: Title for the HTML document (optional).
+    :param output_path: Custom output path for the HTML file (optional).
+                       If not provided, uses 'static/description/index.html'
     """
     try:
         # If md_file_path is provided as an argument
         if md_file_path:
             # Convert to absolute path
             md_file_path = os.path.abspath(md_file_path)
-            # Create output path in static/description/
-            filename = os.path.basename(md_file_path)
-            base_name = os.path.splitext(filename)[0]
-            output_dir = os.path.join(os.path.dirname(md_file_path), 'static', 'description')
-            output_path = os.path.join(output_dir, 'index.html')
         else:
-            # Use default path
-            output_dir = os.path.join(os.getcwd(), 'static', 'description')
-            output_path = os.path.join(output_dir, 'index.html')
             # Look for any .md file in current directory
             md_files = [f for f in os.listdir(os.getcwd()) if f.endswith('.md')]
             if md_files:
@@ -39,6 +34,16 @@ def convert_md_to_html(md_file_path=None, title="Documentation"):
         # Ensure the markdown file exists
         if not os.path.exists(md_file_path):
             raise FileNotFoundError(f"Markdown file not found: {md_file_path}")
+
+        # Determine output path
+        if output_path:
+            # Use the provided output path
+            output_path = os.path.abspath(output_path)
+            output_dir = os.path.dirname(output_path)
+        else:
+            # Use default path in static/description/
+            output_dir = os.path.join(os.path.dirname(md_file_path), 'static', 'description')
+            output_path = os.path.join(output_dir, 'index.html')
 
         # Create output directory if it doesn't exist
         os.makedirs(output_dir, exist_ok=True)
@@ -71,8 +76,7 @@ def convert_md_to_html(md_file_path=None, title="Documentation"):
         styles = get_default_styles()
 
         # Create the HTML output with inline styles
-        html_output = f"""
-<!DOCTYPE html>
+        html_output = f"""<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -91,8 +95,7 @@ def convert_md_to_html(md_file_path=None, title="Documentation"):
     </div>
 </div>
 </body>
-</html>
-"""
+</html>"""
 
         # Apply styles to the HTML content
         html_output = apply_styles_to_html(html_output, styles)
@@ -110,15 +113,22 @@ def convert_md_to_html(md_file_path=None, title="Documentation"):
 
 
 def main():
-    # Get command line arguments
-    args = sys.argv[1:]
+    parser = argparse.ArgumentParser(
+        description='Convert Markdown files to styled HTML for Odoo modules'
+    )
+    parser.add_argument('file', nargs='?', help='Path to the markdown file (optional)')
+    parser.add_argument('--version', action='version',
+                        version=f'md2indexhtml {__version__}')
+    parser.add_argument('--title', help='Specify a custom title for the HTML document')
+    parser.add_argument('--output', '-o', help='Specify a custom output path for the HTML file')
 
-    if args:
-        # If argument provided, use it as markdown file path
-        convert_md_to_html(args[0])
-    else:
-        # If no argument, try to convert markdown file in current directory
-        convert_md_to_html()
+    args = parser.parse_args()
+
+    try:
+        convert_md_to_html(args.file, args.title, args.output)
+    except Exception as e:
+        print(f"Error: {str(e)}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == '__main__':
