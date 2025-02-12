@@ -1,93 +1,124 @@
-import argparse
 import os
-import shutil
+import sys
 import markdown
 from markdown.extensions.toc import TocExtension
-from markdown.extensions.fenced_code import FencedCodeExtension
-from .utils import load_template, extract_title_and_headers
+from .utils import extract_title_and_headers, get_default_styles, apply_styles_to_html
+
+__version__ = "0.1.5"
 
 
-__version__ = "0.1.4"
-
-
-def convert_md_to_html(md_file_path, output_dir=None, template_path=None, custom_css_path=None, title="Documentation"):
+def convert_md_to_html(md_file_path=None, title="Documentation"):
     """
-    Convert a Markdown file to an HTML file using a specified template and optional custom CSS.
+    Convert a Markdown file to an HTML file with inline styles.
 
-    :param md_file_path: Path to the Markdown file.
-    :param output_dir: Directory to save the output HTML file (optional).
-    :param template_path: Path to the HTML template (optional).
-    :param custom_css_path: Path to a custom CSS file (optional).
-    :param title: Title for the HTML document and navbar (optional).
+    :param md_file_path: Path to the Markdown file (optional).
+                        If not provided, uses 'static/description/index.html'
+    :param title: Title for the HTML document (optional).
     """
-    # Default output directory to the current directory if not provided
-    if output_dir is None:
-        output_dir = os.getcwd()
+    try:
+        # If md_file_path is provided as an argument
+        if md_file_path:
+            # Convert to absolute path
+            md_file_path = os.path.abspath(md_file_path)
+            # Create output path in static/description/
+            filename = os.path.basename(md_file_path)
+            base_name = os.path.splitext(filename)[0]
+            output_dir = os.path.join(os.path.dirname(md_file_path), 'static', 'description')
+            output_path = os.path.join(output_dir, 'index.html')
+        else:
+            # Use default path
+            output_dir = os.path.join(os.getcwd(), 'static', 'description')
+            output_path = os.path.join(output_dir, 'index.html')
+            # Look for any .md file in current directory
+            md_files = [f for f in os.listdir(os.getcwd()) if f.endswith('.md')]
+            if md_files:
+                md_file_path = os.path.join(os.getcwd(), md_files[0])
+            else:
+                raise FileNotFoundError("No markdown file found in current directory")
 
-    # Read the Markdown file
-    with open(md_file_path, 'r', encoding='utf-8') as md_file:
-        md_content = md_file.read()
+        # Ensure the markdown file exists
+        if not os.path.exists(md_file_path):
+            raise FileNotFoundError(f"Markdown file not found: {md_file_path}")
 
-    # Extract title and headers
-    md_title, headers_html = extract_title_and_headers(md_content)
+        # Create output directory if it doesn't exist
+        os.makedirs(output_dir, exist_ok=True)
 
-    # Use provided title if given, otherwise use extracted title
-    page_title = title or md_title
+        # Read the Markdown file
+        with open(md_file_path, 'r', encoding='utf-8') as md_file:
+            md_content = md_file.read()
 
-    # Convert Markdown to HTML with the table extension, TOC extension, and fenced code extension
-    html_content = markdown.markdown(md_content, extensions=['tables', TocExtension(anchorlink=True, slugify=markdown.extensions.toc.slugify_unicode), FencedCodeExtension()])
+        # Extract title and headers
+        md_title, toc_html = extract_title_and_headers(md_content)
 
-    # Load the HTML template
-    template = load_template(template_path or 'index.html')
+        # Use provided title if given, otherwise use extracted title
+        page_title = title or md_title
 
-    # Add custom CSS link if provided
-    custom_css_link = f'<link rel="stylesheet" href="{os.path.basename(custom_css_path)}">' if custom_css_path else ''
+        # Convert Markdown to HTML with extensions
+        html_content = markdown.markdown(
+            md_content,
+            extensions=[
+                'tables',
+                'fenced_code',
+                TocExtension(anchorlink=True),
+                'codehilite',
+                'nl2br',
+                'sane_lists',
+                'attr_list'
+            ]
+        )
 
-    # Combine the template and the HTML content
-    html_output = (template
-                   .replace('{{ title }}', page_title)
-                   .replace('{{ sidebar }}', headers_html)
-                   .replace('{{ content }}', html_content)
-                   .replace('{{ custom_css }}', custom_css_link)
-                   .replace('{{ navbar_title }}', title))
+        # Get default styles
+        styles = get_default_styles()
 
-    # Ensure output directory exists
-    os.makedirs(output_dir, exist_ok=True)
+        # Create the HTML output with inline styles
+        html_output = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{page_title}</title>
+</head>
+<body>
+<div class="md-container" style="{'; '.join([f'{k}: {v}' for k, v in styles['md-container'].items()])}" data-title="{page_title}">
+    <div class="markdown-body" style="{'; '.join([f'{k}: {v}' for k, v in styles['markdown-body'].items()])}">
+        {html_content[:html_content.find('</h1>') + 5] if '</h1>' in html_content else html_content}
+        <div class="toc-container" style="{'; '.join([f'{k}: {v}' for k, v in styles['toc-container'].items()])}">
+            <h2 style="{'; '.join([f'{k}: {v}' for k, v in styles['toc-h2'].items()])}">Table of Contents</h2>
+            {toc_html}
+        </div>
+        {html_content[html_content.find('</h1>') + 5:] if '</h1>' in html_content else ''}
+    </div>
+</div>
+</body>
+</html>
+"""
 
-    # Write the output to an HTML file
-    output_path = os.path.join(output_dir, 'index.html')
-    with open(output_path, 'w', encoding='utf-8') as html_file:
-        html_file.write(html_output)
+        # Apply styles to the HTML content
+        html_output = apply_styles_to_html(html_output, styles)
 
-    # Copy the custom CSS file to the output directory if provided
-    if custom_css_path:
-        try:
-            shutil.copy(custom_css_path, output_dir)
-            print(f"Copied {custom_css_path} to {output_dir}")
-        except Exception as e:
-            print(f"Failed to copy CSS file: {e}")
+        # Write the output to an HTML file
+        with open(output_path, 'w', encoding='utf-8') as html_file:
+            html_file.write(html_output)
 
-    print(f"Converted {md_file_path} to {output_path}")
+        print(f"Successfully converted {md_file_path} to {output_path}")
+        return output_path
+
+    except Exception as e:
+        print(f"Error: {str(e)}", file=sys.stderr)
+        sys.exit(1)
 
 
 def main():
-    # Set up argument parsing
-    parser = argparse.ArgumentParser(description='Convert a Markdown file to an HTML file.')
-    parser.add_argument('md_file_path', type=str, nargs='?', help='Path to the Markdown file.')
-    parser.add_argument('output_dir', type=str, nargs='?', default=None, help='Directory to save the output HTML file (optional).')
-    parser.add_argument('--template', type=str, help='Path to the HTML template (optional).')
-    parser.add_argument('--css', type=str, help='Path to a custom CSS file (optional).')
-    parser.add_argument('--title', type=str, default='Documentation', help='Title for the HTML document and navbar (optional).')
-    parser.add_argument('--version', action='version', version=f'md2indexhtml {__version__}\n[Author: fasilwdr@hotmail.com]', help='Show the version of the package.')
+    # Get command line arguments
+    args = sys.argv[1:]
 
-    # Parse arguments
-    args = parser.parse_args()
-
-    # If md_file_path is provided, proceed with conversion
-    if args.md_file_path:
-        convert_md_to_html(args.md_file_path, args.output_dir, args.template, args.css, args.title)
+    if args:
+        # If argument provided, use it as markdown file path
+        convert_md_to_html(args[0])
     else:
-        parser.print_usage()
+        # If no argument, try to convert markdown file in current directory
+        convert_md_to_html()
 
 
 if __name__ == '__main__':

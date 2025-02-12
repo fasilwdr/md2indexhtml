@@ -1,13 +1,14 @@
 # md2indexhtml
 
-`md2indexhtml` is a Python package that converts Markdown files to HTML files as index.html.
+`md2indexhtml` is a Python package designed to simplify the creation of `index.html` files for Odoo modules. It converts Markdown files to HTML with a clean, modern style that integrates well with Odoo's documentation system.
 
 ## Features
 
-- Converts Markdown to HTML
-- Supports custom templates and CSS
-- Automatically generates a sidebar from headers
-- Easy-to-use command line interface
+- Automatically converts Markdown to styled HTML
+- Creates `index.html` in the `static/description` directory (Odoo standard location)
+- Generates a clean, professional table of contents
+- Applies modern, responsive styling without requiring external CSS
+- Simple command-line interface
 
 ## Installation
 
@@ -17,80 +18,84 @@ Install the package using pip:
 pip install md2indexhtml
 ```
 
-# Usage
+## Usage
 
-This document provides instructions on how to use the `md2indexhtml` package to convert Markdown files to HTML files.
+### Basic Usage
 
-## Basic Usage
-
-To convert a Markdown file to an HTML file using the default settings, run the following command:
-```bash
-md2indexhtml path/to/yourfile.md
-```
-
-## Advanced Usage
-
-You can customize the conversion by providing additional options:
- 
-- `output_dir`: Directory to save the output HTML file.
-- `template`: Path to the HTML template.
-- `css`: Path to a custom CSS file.
-- `title`: Title for the HTML document and navbar.
-
-Example:
-```bash
-md2indexhtml path/to/yourfile.md path/to/output/dir --template path/to/template.html --css path/to/custom.css --title "My Documentation"
-```
-
-## Themes
-
-### Default Theme
+The simplest way to use md2indexhtml is to run it in your Odoo module directory:
 
 ```bash
-md2indexhtml README.md output --title "Default Theme"
+cd your_odoo_module
+md2indexhtml README.md
 ```
 
-![Default](https://raw.githubusercontent.com/fasilwdr/md2indexhtml/main/screenshots/index.jpg)
+This will:
+1. Convert your README.md to HTML
+2. Create a `static/description` directory if it doesn't exist
+3. Save the converted file as `index.html` in that directory
 
-### GoDocs Theme
+### Without Arguments
+
+If you run md2indexhtml without any arguments in a directory containing a markdown file:
 
 ```bash
-md2indexhtml README.md output --title "GoDocs Theme" --template godocs.html
+cd your_odoo_module
+md2indexhtml
 ```
 
-![GoDocs](https://raw.githubusercontent.com/fasilwdr/md2indexhtml/main/screenshots/godocs.jpg)
+It will automatically:
+1. Find the first .md file in the current directory
+2. Convert it to HTML
+3. Save it as `static/description/index.html`
 
-### DocBox Theme
-
-```bash
-md2indexhtml README.md output --title "DocBox Theme" --template docbox.html 
-```
-
-![GoDocs](https://raw.githubusercontent.com/fasilwdr/md2indexhtml/main/screenshots/docbox.jpg)
-
-# Python API
+### Python API
 
 You can also use the package programmatically in your Python code:
 
 ```python
 from md2indexhtml import convert_md_to_html
 
-convert_md_to_html(
-    md_file_path="path/to/yourfile.md",
-    output_dir="path/to/output/dir",
-    template_path="path/to/template.html",
-    custom_css_path="path/to/custom.css",
-    title="My Documentation"
-)
+# Convert specific file
+convert_md_to_html("README.md")
+
+# Or let it find a markdown file automatically
+convert_md_to_html()
 ```
 
-# Contributing
+## Output Example
+
+The converted HTML file will include:
+- Responsive design
+- Table of contents with smooth scrolling
+- Syntax highlighting for code blocks
+- Modern typography and spacing
+- Mobile-friendly layout
+
+## Styling
+
+The package includes a built-in style system that provides:
+- Clean, professional typography
+- Syntax highlighting for code blocks
+- Responsive tables
+- Block quotes styling
+- Hierarchical heading styles
+- Mobile-friendly design
+
+All styles are included inline in the HTML file, so no external CSS files are needed.
+
+## Use with Odoo
+
+This package is specifically designed for Odoo module documentation. When you publish your module, the generated `index.html` in `static/description` will automatically be used as the module's documentation page on the Odoo Apps store.
+
+## Contributing
 
 Contributions are welcome! Please feel free to submit a pull request or open an issue on GitHub.
 
-# License
+## License
+
 This project is licensed under the MIT License.
 
-```
-Feel free to adjust any of the content to better suit your needs.
-```
+## Author
+
+Fasil (@fasilwdr)
+Email: fasilwdr@hotmail.com

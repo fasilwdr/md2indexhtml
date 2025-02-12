@@ -1,3 +1,35 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=45", "wheel>=0.37.0"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "md2indexhtml"
+dynamic = ["version", "dependencies"]
+description = "Convert Markdown files to index.html for Odoo modules"
+readme = "README.md"
+authors = [
+    {name = "Fasil", email = "fasilwdr@hotmail.com"}
+]
+requires-python = ">=3.6"
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Text Processing :: Markup :: HTML",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+keywords = ["markdown", "html", "odoo", "documentation"]
+
+[project.urls]
+Homepage = "https://github.com/fasilwdr/md2indexhtml"
+"Bug Reports" = "https://github.com/fasilwdr/md2indexhtml/issues"
+Source = "https://github.com/fasilwdr/md2indexhtml"
