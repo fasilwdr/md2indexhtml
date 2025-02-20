@@ -5,16 +5,18 @@ import sys
 import argparse
 import markdown
 import re
-from .utils import wrap_sections
+from .utils import wrap_sections, handle_images
 
-__version__ = "0.1.7"
+__version__ = "0.1.8"
 
 
-def process_content_blocks(content):
+def process_content_blocks(content, md_file_path, output_dir):
     """
     Process content maintaining the original order of HTML and Markdown blocks
 
     :param content: Mixed content string
+    :param md_file_path: Path to original markdown file
+    :param output_dir: Output directory path
     :return: Processed HTML content with preserved order
     """
     # Pattern to match complete HTML section blocks
@@ -31,11 +33,13 @@ def process_content_blocks(content):
             is_section = bool(re.match(pattern, part.strip()))
 
             if is_section:
+                # Process images in HTML sections
+                processed_part = handle_images(part, md_file_path, output_dir)
                 # Hash the content to check for duplicates
-                section_hash = hash(part.strip())
+                section_hash = hash(processed_part.strip())
                 if section_hash not in seen_sections:
                     seen_sections.add(section_hash)
-                    processed_parts.append(part)
+                    processed_parts.append(processed_part)
             else:
                 # Convert markdown content
                 converted = markdown.markdown(
@@ -50,6 +54,8 @@ def process_content_blocks(content):
                     ]
                 )
                 if converted.strip():  # Only wrap if there's content
+                    # Process images in converted markdown
+                    converted = handle_images(converted, md_file_path, output_dir)
                     processed_parts.append(wrap_sections(converted))
 
     return '\n'.join(processed_parts)
@@ -59,6 +65,7 @@ def convert_md_to_html(md_file_path=None, title="Documentation", output_path=Non
     """
     Convert a Markdown file to an HTML file with inline styles and section-based structure.
     Preserves raw HTML sections while converting Markdown content, maintaining original order.
+    Also handles image copying and path updates.
     """
     try:
         # Handle file path logic
@@ -88,8 +95,8 @@ def convert_md_to_html(md_file_path=None, title="Documentation", output_path=Non
         with open(md_file_path, 'r', encoding='utf-8') as md_file:
             content = md_file.read()
 
-        # Process content blocks maintaining order
-        processed_content = process_content_blocks(content)
+        # Process content blocks maintaining order and handle images
+        processed_content = process_content_blocks(content, md_file_path, output_dir)
 
         # Create the final HTML output with inline styles
         html_output = f"""<!DOCTYPE html>
@@ -127,7 +134,7 @@ def main():
     )
     parser.add_argument('file', nargs='?', help='Path to the markdown file (optional)')
     parser.add_argument('--version', action='version',
-                        version=f'md2indexhtml {__version__}')
+                       version=f'md2indexhtml {__version__}')
     parser.add_argument('--title', help='Specify a custom title for the HTML document', default="Documentation")
     parser.add_argument('--output', '-o', help='Specify a custom output path for the HTML file')
 

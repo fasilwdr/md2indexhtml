@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "md2indexhtml"
-version = "0.1.7"
+version = "0.1.8"
 description = "Convert Markdown files to index.html for Odoo modules"
 readme = "README.md"
 authors = [

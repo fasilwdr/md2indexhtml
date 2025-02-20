@@ -1,6 +1,77 @@
 # utils.py
 
 import re
+import os
+import shutil
+
+
+def handle_images(content, md_file_path, output_dir):
+    """
+    Process image paths in content and copy images to output directory
+
+    :param content: HTML content
+    :param md_file_path: Path to original markdown file
+    :param output_dir: Output directory path
+    :return: Updated content with new image paths
+    """
+
+    def is_local_path(path):
+        """Check if the path is a local file path"""
+        return not path.startswith(('http://', 'https://', 'data:', '/web/', 'www.'))
+
+    def process_image_path(img_path):
+        """Process and copy local image if needed"""
+        img_path = img_path.strip("'\" ")
+
+        # Skip non-local paths
+        if not is_local_path(img_path):
+            return img_path
+
+        try:
+            # Get absolute paths
+            md_dir = os.path.dirname(os.path.abspath(md_file_path))
+            abs_img_path = os.path.normpath(os.path.join(md_dir, img_path))
+
+            # Skip if image doesn't exist
+            if not os.path.isfile(abs_img_path):
+                print(f"Warning: Image not found at {abs_img_path}")
+                return img_path
+
+            # Create target directory structure
+            rel_dir = os.path.dirname(img_path)
+            if rel_dir:
+                target_dir = os.path.join(output_dir, rel_dir)
+                os.makedirs(target_dir, exist_ok=True)
+
+            # Copy the image
+            target_path = os.path.join(output_dir, img_path)
+            shutil.copy2(abs_img_path, target_path)
+
+            return img_path
+
+        except Exception as e:
+            print(f"Warning: Failed to process image {img_path}: {str(e)}")
+            return img_path
+
+    # Handle Markdown image syntax
+    def replace_md_image(match):
+        alt_text = match.group(1)
+        img_path = process_image_path(match.group(2))
+        return f'<img alt="{alt_text}" src="{img_path}"/>'
+
+    # Handle HTML image syntax
+    def replace_html_image(match):
+        quote = match.group(1)  # preserve the original quote type
+        img_path = process_image_path(match.group(2))
+        return f'src={quote}{img_path}{quote}'
+
+    # Process Markdown image syntax first
+    content = re.sub(r'!\[([^\]]*)\]\(([^)]+)\)', replace_md_image, content)
+
+    # Then process HTML image tags
+    content = re.sub(r'src=(["\'])(.*?)\1', replace_html_image, content)
+
+    return content
 
 
 def wrap_sections(html_content):
@@ -81,6 +152,6 @@ def add_markdown_styles(content):
                      '<blockquote style="border-left: 4px solid #52A3AB; padding: 10px 15px; margin: 10px 0; background: #f7f9fc; color: #34495e;">',
                      content)
     content = re.sub(r'<a\s', '<a style="color: #52A3AB; text-decoration: none;" ', content)
-    content = re.sub(r'<img\s', '<img style="width: 100%;" ', content)
+    content = re.sub(r'<img\s', '<img style="max-width: 100%; height: auto;" ', content)
 
     return content
