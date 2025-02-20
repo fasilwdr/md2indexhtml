@@ -134,10 +134,10 @@ When converting your documentation:
 
 For example:
 
-An image at screenshots/feature.png becomes images/feature.png in the output
-An image at assets/img/demo/screenshot.png becomes images/screenshot.png
-An external image https://example.com/image.jpg remains unchanged
-A base64 image data:image/png;base64,... remains unchanged
+An image at `screenshots/feature.png` becomes `images/feature.png` in the output
+An image at `assets/img/demo/screenshot.png` becomes `images/screenshot.png`
+An external image `https://example.com/image.jpg` remains unchanged
+A base64 image `data:image/png;base64,...` remains unchanged
 
 ### Python API
 
