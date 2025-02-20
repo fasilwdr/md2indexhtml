@@ -96,22 +96,26 @@ The package automatically handles images in both Markdown and HTML formats:
 
 ```markdown
 # Using Markdown syntax
-![Alt text](images/screenshot.png)
+![Alt text](any/path/screenshot.png)
 
 # Using HTML syntax
-<img src="images/screenshot.png" alt="Alt text">
+<img src="path/to/screenshot.png" alt="Alt text">
 ```
 When converting your documentation:
 
-* Local images are automatically copied to the output directory
-* Original directory structure is maintained
-* Image paths are updated in the generated HTML
+* All local images are automatically copied to an images/ directory in the output path
+* Only the filename is kept, discarding the original directory structure
+* Image paths in the HTML are updated to point to images/filename.png
 * External images (http/https URLs) remain unchanged
+* Base64 encoded images are preserved as is
 * Missing images generate warnings but don't stop the conversion
 
-For example, if your markdown file references an image at `images/screenshots/feature.png`, it will be copied to `static/description/images/screenshots/feature.png` in the output, maintaining the same directory structure.
+For example:
 
-The converter will preserve your HTML sections exactly as written while converting markdown sections into styled HTML.
+An image at screenshots/feature.png becomes images/feature.png in the output
+An image at assets/img/demo/screenshot.png becomes images/screenshot.png
+An external image https://example.com/image.jpg remains unchanged
+A base64 image data:image/png;base64,... remains unchanged
 
 ### Python API
 

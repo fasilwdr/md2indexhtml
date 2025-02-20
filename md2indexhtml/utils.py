@@ -8,6 +8,8 @@ import shutil
 def handle_images(content, md_file_path, output_dir):
     """
     Process image paths in content and copy images to output directory
+    All local images are copied to images/ directory in output_dir
+    Only filenames are kept, discarding original directory structure
 
     :param content: HTML content
     :param md_file_path: Path to original markdown file
@@ -17,13 +19,14 @@ def handle_images(content, md_file_path, output_dir):
 
     def is_local_path(path):
         """Check if the path is a local file path"""
-        return not path.startswith(('http://', 'https://', 'data:', '/web/', 'www.'))
+        return not (path.startswith(('http://', 'https://', 'data:', '/web/', 'www.')) or
+                    path.startswith('data:image/'))  # Handle base64 images
 
     def process_image_path(img_path):
         """Process and copy local image if needed"""
         img_path = img_path.strip("'\" ")
 
-        # Skip non-local paths
+        # Skip non-local paths and base64 images
         if not is_local_path(img_path):
             return img_path
 
@@ -37,17 +40,19 @@ def handle_images(content, md_file_path, output_dir):
                 print(f"Warning: Image not found at {abs_img_path}")
                 return img_path
 
-            # Create target directory structure
-            rel_dir = os.path.dirname(img_path)
-            if rel_dir:
-                target_dir = os.path.join(output_dir, rel_dir)
-                os.makedirs(target_dir, exist_ok=True)
+            # Create images directory in output path
+            images_dir = os.path.join(output_dir, 'images')
+            os.makedirs(images_dir, exist_ok=True)
 
-            # Copy the image
-            target_path = os.path.join(output_dir, img_path)
+            # Get just the filename from the path
+            filename = os.path.basename(img_path)
+
+            # Copy the image to images directory
+            target_path = os.path.join(images_dir, filename)
             shutil.copy2(abs_img_path, target_path)
 
-            return img_path
+            # Return the new path relative to output directory
+            return f'images/{filename}'
 
         except Exception as e:
             print(f"Warning: Failed to process image {img_path}: {str(e)}")
@@ -56,14 +61,28 @@ def handle_images(content, md_file_path, output_dir):
     # Handle Markdown image syntax
     def replace_md_image(match):
         alt_text = match.group(1)
-        img_path = process_image_path(match.group(2))
-        return f'<img alt="{alt_text}" src="{img_path}"/>'
+        img_path = match.group(2)
+
+        # If it's a base64 image, keep it as is
+        if img_path.startswith('data:image/'):
+            return f'<img alt="{alt_text}" src="{img_path}"/>'
+
+        # Process other images
+        new_path = process_image_path(img_path)
+        return f'<img alt="{alt_text}" src="{new_path}"/>'
 
     # Handle HTML image syntax
     def replace_html_image(match):
         quote = match.group(1)  # preserve the original quote type
-        img_path = process_image_path(match.group(2))
-        return f'src={quote}{img_path}{quote}'
+        img_path = match.group(2)
+
+        # If it's a base64 image, keep it as is
+        if img_path.startswith('data:image/'):
+            return f'src={quote}{img_path}{quote}'
+
+        # Process other images
+        new_path = process_image_path(img_path)
+        return f'src={quote}{new_path}{quote}'
 
     # Process Markdown image syntax first
     content = re.sub(r'!\[([^\]]*)\]\(([^)]+)\)', replace_md_image, content)

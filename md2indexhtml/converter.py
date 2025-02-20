@@ -7,7 +7,7 @@ import markdown
 import re
 from .utils import wrap_sections, handle_images
 
-__version__ = "0.1.8"
+__version__ = "0.2.1"
 
 
 def process_content_blocks(content, md_file_path, output_dir):
