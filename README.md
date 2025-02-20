@@ -1,13 +1,15 @@
 # md2indexhtml
 
-`md2indexhtml` is a Python package designed to simplify the creation of `index.html` files for Odoo modules. It converts Markdown files to HTML with a clean, modern style that integrates well with Odoo's documentation system.
+`md2indexhtml` is a Python package designed to simplify the creation of `index.html` files for Odoo modules. It converts Markdown files to HTML with a clean, modern style that integrates well with Odoo's documentation system. The package supports both markdown content and direct HTML sections, allowing for flexible and beautiful documentation.
 
 ## Features
 
 - Automatically converts Markdown to styled HTML
 - Creates `index.html` in the `static/description` directory (Odoo standard location)
-- Generates a clean, professional table of contents
-- Applies modern, responsive styling without requiring external CSS
+- Supports direct HTML sections in markdown files
+- Converts markdown headers (#, ##) into styled sections automatically
+- Creates responsive card-based layouts for content
+- Applies modern, inline styling without external CSS
 - Simple command-line interface
 - Flexible output path options
 
@@ -49,6 +51,14 @@ It will automatically:
 2. Convert it to HTML
 3. Save it as `static/description/index.html`
 
+### Custom Title
+
+You can specify a custom title for the HTML document (defaults to "Documentation"):
+
+```bash
+md2indexhtml README.md --title "My Documentation"
+```
+
 ### Custom Output Path
 
 You can specify a custom output path using the `--output` or `-o` argument:
@@ -59,18 +69,26 @@ md2indexhtml README.md --output /path/to/output/docs.html
 md2indexhtml README.md -o /path/to/output/docs.html
 ```
 
-This will:
-1. Convert your README.md to HTML
-2. Create the output directory if it doesn't exist
-3. Save the converted file at the specified path
+### Mixing HTML and Markdown
 
-### Custom Title
+You can mix direct HTML sections with markdown content in your files:
 
-You can specify a custom title for the HTML document:
+```markdown
+<section style="background: #003554;">
+    <!-- Your custom HTML section -->
+</section>
 
-```bash
-md2indexhtml README.md --title "My Documentation"
+# Module Title
+## Feature 1
+- Feature description
+- Another point
+
+<section style="background: linear-gradient(...);">
+    <!-- Another HTML section -->
+</section>
 ```
+
+The converter will preserve your HTML sections exactly as written while converting markdown sections into styled HTML.
 
 ### Python API
 
@@ -92,26 +110,25 @@ convert_md_to_html("README.md", title="My Documentation")
 convert_md_to_html()
 ```
 
-## Output Example
+## Output Style
 
-The converted HTML file will include:
-- Responsive design
-- Table of contents with smooth scrolling
+The converted HTML file includes:
+
+- Gradient backgrounds for main sections
+- Card-based layout for subsections
+- Modern typography with Inter font
+- Responsive design for all screen sizes
 - Syntax highlighting for code blocks
-- Modern typography and spacing
+- Clean lists and blockquotes styling
 - Mobile-friendly layout
+- All styles are inline (no external CSS needed)
 
-## Styling
+### Markdown Conversion
 
-The package includes a built-in style system that provides:
-- Clean, professional typography
-- Syntax highlighting for code blocks
-- Responsive tables
-- Block quotes styling
-- Hierarchical heading styles
-- Mobile-friendly design
-
-All styles are included inline in the HTML file, so no external CSS files are needed.
+- `#` headers become full-width gradient sections
+- `##` headers become card sections with white backgrounds
+- Lists, code blocks, and other markdown elements get appropriate styling
+- Custom HTML sections are preserved exactly as written
 
 ## Use with Odoo
 
@@ -127,5 +144,5 @@ This project is licensed under the MIT License.
 
 ## Author
 
-Fasil (@fasilwdr)
+Fasil (@fasilwdr)  
 Email: fasilwdr@hotmail.com
