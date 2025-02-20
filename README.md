@@ -130,6 +130,13 @@ The converted HTML file includes:
 - Lists, code blocks, and other markdown elements get appropriate styling
 - Custom HTML sections are preserved exactly as written
 
+## Sample Usages
+
+- ![Sample Usage 1](img/sample_usage1.jpg)
+- ![Sample Usage 2](img/sample_usage2.jpg)
+- ![Sample Usage 3](img/sample_usage3.jpg)
+
+
 ## Use with Odoo
 
 This package is specifically designed for Odoo module documentation. When you publish your module, the generated `index.html` in `static/description` will automatically be used as the module's documentation page on the Odoo Apps store.
