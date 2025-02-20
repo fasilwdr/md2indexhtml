@@ -81,5 +81,6 @@ def add_markdown_styles(content):
                      '<blockquote style="border-left: 4px solid #52A3AB; padding: 10px 15px; margin: 10px 0; background: #f7f9fc; color: #34495e;">',
                      content)
     content = re.sub(r'<a\s', '<a style="color: #52A3AB; text-decoration: none;" ', content)
+    content = re.sub(r'<img\s', '<img style="width: 100%;" ', content)
 
     return content
