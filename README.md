@@ -2,103 +2,27 @@
 
 `md2indexhtml` is a Python package designed to simplify the creation of `index.html` files for Odoo modules. It converts Markdown files to HTML with a clean, modern style that integrates well with Odoo's documentation system. The package supports both markdown content and direct HTML sections, allowing for flexible and beautiful documentation.
 
-<section style="
-    background: linear-gradient(135deg, #2D3250 0%, #424769 100%);
-    border-radius: 20px;
-    margin: 40px auto;
-    padding: 3rem 2rem;
-    max-width: 1200px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
-    <div style="text-align: center; margin-bottom: 3rem;">
-        <h2 style="
-            color: #F6B17A;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            font-weight: 700;">
-            Package in Action
-        </h2>
-        <p style="
-            color: #7077A1;
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto;">
-            Transform your Markdown documentation into beautiful, styled HTML pages for Odoo modules
-        </p>
-    </div>
-    <div style="
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2rem;
-        margin-bottom: 2rem;">
-        <div style="
-            background: #F6F6F6;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-            max-width: 800px;
-            width: 100%;">
-            <div style="padding: 1.5rem;">
-                <img src="https://raw.githubusercontent.com/fasilwdr/md2indexhtml/refs/heads/main/img/sample_usage1.jpg" 
-                     alt="Clean Documentation Example" 
-                     style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            </div>
-        </div>
-        <div style="
-            background: #F6F6F6;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-            max-width: 800px;
-            width: 100%;">
-            <div style="padding: 1.5rem;">
-                <img src="https://raw.githubusercontent.com/fasilwdr/md2indexhtml/refs/heads/main/img/sample_usage2.jpg" 
-                     alt="Modern Styling Example" 
-                     style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            </div>
-        </div>
-        <div style="
-            background: #F6F6F6;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-            max-width: 800px;
-            width: 100%;">
-            <div style="padding: 1.5rem;">
-                <img src="https://raw.githubusercontent.com/fasilwdr/md2indexhtml/refs/heads/main/img/sample_usage3.jpg" 
-                     alt="Professional Layout Example" 
-                     style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            </div>
-        </div>
-    </div>
-    <div style="
-        text-align: center;
-        padding: 2rem;
-        background: rgba(255,255,255,0.1);
-        border-radius: 12px;
-        margin-top: 2rem;">
-        <p style="
-            color: #F6B17A;
-            font-size: 1.1rem;
-            margin: 0;">
-            Transform your documentation with a single command:
-        </p>
-        <code style="
-            display: inline-block;
-            margin-top: 1rem;
-            padding: 1rem 2rem;
-            background: #2D3250;
-            color: #F6B17A;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 1.1rem;">
-            md2indexhtml README.md
-        </code>
-    </div>
-</section>
+<div align="center">
+  <h2>Package in Action</h2>
+  <p>Transform your Markdown documentation into beautiful, styled HTML pages for Odoo modules</p>
+</div>
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/fasilwdr/md2indexhtml/refs/heads/main/img/sample_usage1.jpg" alt="Clean Documentation Example" width="800"/>
+</div>
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/fasilwdr/md2indexhtml/refs/heads/main/img/sample_usage2.jpg" alt="Modern Styling Example" width="800"/>
+</div>
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/fasilwdr/md2indexhtml/refs/heads/main/img/sample_usage3.jpg" alt="Professional Layout Example" width="800"/>
+</div>
+
+<div align="center">
+  <p>Transform your documentation with a single command:</p>
+  <pre><code>md2indexhtml README.md</code></pre>
+</div>
 
 ## Features
 
@@ -254,13 +178,6 @@ The converted HTML file includes:
 - `##` headers become card sections with white backgrounds
 - Lists, code blocks, and other markdown elements get appropriate styling
 - Custom HTML sections are preserved exactly as written
-
-## Sample Usages
-
-- ![Sample Usage 1](https://raw.githubusercontent.com/fasilwdr/md2indexhtml/refs/heads/main/img/sample_usage1.jpg)
-- ![Sample Usage 2](https://raw.githubusercontent.com/fasilwdr/md2indexhtml/refs/heads/main/img/sample_usage2.jpg)
-- ![Sample Usage 3](https://raw.githubusercontent.com/fasilwdr/md2indexhtml/refs/heads/main/img/sample_usage3.jpg)
-
 
 ## Use with Odoo
 
