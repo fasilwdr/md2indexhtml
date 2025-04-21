@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "md2indexhtml"
-version = "0.2.1"
+version = "0.3.0"  # Updated version
 description = "Convert Markdown files to index.html for Odoo modules"
 readme = "README.md"
 authors = [
@@ -28,7 +28,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-keywords = ["markdown", "html", "odoo", "documentation"]
+keywords = ["markdown", "html", "odoo", "documentation", "bootstrap"]  # Added bootstrap keyword
 
 [project.urls]
 Homepage = "https://github.com/fasilwdr/md2indexhtml"

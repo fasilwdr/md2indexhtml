@@ -33,7 +33,8 @@
 - Maintains image directory structure
 - Converts markdown headers (#, ##) into styled sections automatically
 - Creates responsive card-based layouts for content
-- Applies modern, inline styling without external CSS
+- Three template styles: modern, simple, and Odoo-specific
+- Bootstrap-based responsive design
 - Simple command-line interface
 - Flexible output path options
 
@@ -92,6 +93,23 @@ md2indexhtml README.md --output /path/to/output/docs.html
 # or use the short form
 md2indexhtml README.md -o /path/to/output/docs.html
 ```
+
+### Template Styles (New in v0.3.0)
+
+You can now choose between three template styles using the `--template` or `-t` argument:
+
+```bash
+# Modern template with Bootstrap styling
+md2indexhtml README.md --template modern
+
+# Simple, clean Bootstrap template
+md2indexhtml README.md --template simple
+
+# Odoo-specific template optimized for Odoo Apps Store
+md2indexhtml README.md --template odoo
+```
+
+By default, the Odoo template is used if no style is specified.
 
 ### Mixing HTML and Markdown
 
@@ -155,6 +173,9 @@ convert_md_to_html("README.md", output_path="docs/output.html")
 # Convert with custom title
 convert_md_to_html("README.md", title="My Documentation")
 
+# Convert with specific template style (new in v0.3.0)
+convert_md_to_html("README.md", template_style="modern")
+
 # Or let it find a markdown file automatically
 convert_md_to_html()
 ```
@@ -163,19 +184,36 @@ convert_md_to_html()
 
 The converted HTML file includes:
 
-- Gradient backgrounds for main sections
-- Card-based layout for subsections
-- Modern typography with Inter font
+- Bootstrap-based responsive design (new in v0.3.0)
+- Modern typography with Inter or Montserrat fonts
 - Responsive design for all screen sizes
 - Syntax highlighting for code blocks
 - Clean lists and blockquotes styling
 - Mobile-friendly layout
-- All styles are inline (no external CSS needed)
+- Three template options to choose from
+
+### Template Styles
+
+#### Modern Template (new in v0.3.0)
+- Contemporary styling with gradients and cards
+- Montserrat font for headings, Inter for body text
+- Hover animations and subtle shadows
+- Perfect for feature-rich modules
+
+#### Simple Template (new in v0.3.0)
+- Clean, minimalist design
+- Lightweight and fast-loading
+- Focus on readability and content
+
+#### Odoo Template (new in v0.3.0)
+- Specifically designed for Odoo Apps Store integration
+- Uses Odoo's color scheme and UI patterns
+- Optimized for the marketplace environment
 
 ### Markdown Conversion
 
-- `#` headers become full-width gradient sections
-- `##` headers become card sections with white backgrounds
+- `#` headers become full-width sections
+- `##` headers become card sections or feature blocks
 - Lists, code blocks, and other markdown elements get appropriate styling
 - Custom HTML sections are preserved exactly as written
 
