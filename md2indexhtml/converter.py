@@ -1,76 +1,78 @@
-# converter.py
+# converter.py - Updated with default Odoo styling only
 
 import os
 import sys
 import argparse
 import markdown
 import re
-from .utils import wrap_sections_bootstrap, handle_images
+from .utils import wrap_sections_odoo, handle_images, DEFAULT_STYLE_CONFIG
+from typing import Optional, Dict
 
-__version__ = "0.3.0"
+__version__ = "0.5.0"
 
 
-def process_content_blocks(content, md_file_path, output_dir):
+def process_content_blocks(content, md_file_path, output_dir, style_config=None):
     """
-    Process content maintaining the original order of HTML and Markdown blocks
+    Process content maintaining the original order of HTML and markdown blocks
 
     :param content: Mixed content string
     :param md_file_path: Path to original markdown file
     :param output_dir: Output directory path
+    :param style_config: Dictionary configuration for styling elements
     :return: Processed HTML content with preserved order
     """
-    # Pattern to match complete HTML section blocks
-    pattern = r'(<section[\s\S]*?</section>)'
+    # Split content by horizontal rules (---) to create sections
+    sections = re.split(r'\n\s*---+\s*\n', content)
+    processed_sections = []
 
-    # Split content and track what we've processed
-    parts = re.split(f'({pattern})', content, flags=re.DOTALL)
-    processed_parts = []
-    seen_sections = set()
+    for section in sections:
+        if section.strip():
+            # Extract HTML sections (content between <section> tags)
+            html_parts = re.split(r'(<section.*?</section>)', section, flags=re.DOTALL)
 
-    for part in parts:
-        if part.strip():  # Skip empty parts
-            # Check if this is a section block
-            is_section = bool(re.match(pattern, part.strip()))
+            for part in html_parts:
+                if part.strip():
+                    if part.strip().startswith('<section'):
+                        # Process images in HTML but preserve the structure
+                        processed_html = handle_images(part, md_file_path, output_dir)
+                        processed_sections.append(processed_html)
+                    else:
+                        # Process regular markdown content
+                        processed_part = handle_images(part, md_file_path, output_dir)
+                        # Convert markdown to HTML
+                        converted = markdown.markdown(
+                            processed_part,
+                            extensions=[
+                                'tables',
+                                'fenced_code',
+                                'codehilite',
+                                'nl2br',
+                                'sane_lists',
+                                'attr_list'
+                            ]
+                        )
+                        if converted.strip():
+                            processed_sections.append(converted)
 
-            if is_section:
-                # Process images in HTML sections
-                processed_part = handle_images(part, md_file_path, output_dir)
-                # Hash the content to check for duplicates
-                section_hash = hash(processed_part.strip())
-                if section_hash not in seen_sections:
-                    seen_sections.add(section_hash)
-                    processed_parts.append(processed_part)
-            else:
-                # Convert markdown content
-                converted = markdown.markdown(
-                    part,
-                    extensions=[
-                        'tables',
-                        'fenced_code',
-                        'codehilite',
-                        'nl2br',
-                        'sane_lists',
-                        'attr_list'
-                    ]
-                )
-                if converted.strip():  # Only wrap if there's content
-                    # Process images in converted markdown
-                    converted = handle_images(converted, md_file_path, output_dir)
-                    processed_parts.append(wrap_sections_bootstrap(converted))
-
-    return '\n'.join(processed_parts)
+    return '\n'.join(processed_sections)
 
 
-def convert_md_to_html(md_file_path=None, title="Documentation", output_path=None, template_style="modern"):
+def convert_md_to_html(
+        md_file_path: Optional[str] = None,
+        title: str = "Documentation",
+        output_path: Optional[str] = None,
+        style_config: Optional[Dict[str, Dict[str, str]]] = None
+):
     """
-    Convert a Markdown file to an HTML file with Bootstrap styling compatible with Odoo Apps Store.
-    Preserves raw HTML sections while converting Markdown content, maintaining original order.
-    Also handles image copying and path updates.
+    Convert a Markdown file to an HTML file using Odoo frontend styling
 
     :param md_file_path: Path to the markdown file
     :param title: Title of the HTML document
     :param output_path: Path where the output HTML file will be saved
-    :param template_style: Style of the template ("modern", "simple", "odoo")
+    :param style_config: Dictionary configuration for styling elements
+                        Format: {"element": {"attribute": "value"}}
+                        Example: {"p": {"class": "mb16"}, "table": {"class": "table table-bordered"}}
+                        If None, uses DEFAULT_STYLE_CONFIG with comprehensive Odoo classes
     :return: Path to the generated HTML file
     """
     try:
@@ -97,26 +99,29 @@ def convert_md_to_html(md_file_path=None, title="Documentation", output_path=Non
 
         os.makedirs(output_dir, exist_ok=True)
 
+        # Use default Odoo styling if no custom config provided
+        if style_config is None:
+            style_config = DEFAULT_STYLE_CONFIG
+
         # Read the Markdown file
         with open(md_file_path, 'r', encoding='utf-8') as md_file:
             content = md_file.read()
 
         # Process content blocks maintaining order and handle images
-        processed_content = process_content_blocks(content, md_file_path, output_dir)
+        processed_content = process_content_blocks(content, md_file_path, output_dir, style_config)
 
-        # Select HTML template based on template_style
-        if template_style == "simple":
-            html_output = generate_simple_template(title, processed_content)
-        elif template_style == "odoo":
-            html_output = generate_odoo_template(title, processed_content)
-        else:  # default to "modern"
-            html_output = generate_modern_template(title, processed_content)
+        # Wrap content in Odoo-styled sections
+        html_output = wrap_sections_odoo(processed_content, title)
 
         # Write the output
         with open(output_path, 'w', encoding='utf-8') as html_file:
             html_file.write(html_output)
 
         print(f"Successfully converted {md_file_path} to {output_path}")
+        if style_config and style_config != DEFAULT_STYLE_CONFIG:
+            print(f"Applied custom styling configuration")
+        else:
+            print(f"Applied default Odoo styling configuration")
         return output_path
 
     except Exception as e:
@@ -124,300 +129,96 @@ def convert_md_to_html(md_file_path=None, title="Documentation", output_path=Non
         sys.exit(1)
 
 
-def generate_simple_template(title, content):
-    """Generate a simple Bootstrap-based HTML template"""
-    return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body {{
-            font-family: 'Inter', Arial, sans-serif;
-            color: #333;
-            background-color: #f8f9fa;
-        }}
-        .container {{
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0,0,0,0.05);
-            border-radius: 8px;
-        }}
-        h1, h2, h3, h4, h5, h6 {{
-            color: #333;
-            margin-top: 1.5rem;
-            margin-bottom: 1rem;
-        }}
-        img {{
-            max-width: 100%;
-            height: auto;
-            border-radius: 4px;
-        }}
-        code {{
-            background-color: #f3f3f3;
-            color: #e74c3c;
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-        }}
-        pre {{
-            background-color: #f8f9fa;
-            padding: 1rem;
-            border-radius: 4px;
-            overflow-x: auto;
-        }}
-        blockquote {{
-            border-left: 4px solid #ddd;
-            padding: 0.5rem 1rem;
-            background-color: #f9f9f9;
-        }}
-        .card {{
-            margin-bottom: 1rem;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }}
-        .card-header {{
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #eee;
-        }}
-    </style>
-</head>
-<body>
-    <div class="container my-5">
-        {content}
-    </div>
-</body>
-</html>"""
+def create_style_config_from_file(config_file_path: str) -> Dict[str, Dict[str, str]]:
+    """
+    Load style configuration from a JSON file
+
+    :param config_file_path: Path to JSON configuration file
+    :return: Style configuration dictionary
+    """
+    import json
+
+    try:
+        with open(config_file_path, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+
+        # Validate the configuration format
+        if not isinstance(config, dict):
+            raise ValueError("Configuration must be a dictionary")
+
+        for element, attributes in config.items():
+            if not isinstance(attributes, dict):
+                raise ValueError(f"Attributes for element '{element}' must be a dictionary")
+
+        return config
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON in configuration file: {str(e)}")
+    except Exception as e:
+        raise ValueError(f"Error loading configuration file: {str(e)}")
 
 
-def generate_modern_template(title, content):
-    """Generate a modern Bootstrap-based HTML template optimized for Odoo Apps Store"""
-    return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {{
-            --primary-color: #003554;
-            --secondary-color: #52A3AB;
-            --text-color: #333;
-            --light-bg: #f8f9fa;
-            --card-bg: #fff;
-        }}
+def show_default_config():
+    """
+    Display the default Odoo styling configuration
+    """
+    print("Default Odoo Styling Configuration:")
+    print("=" * 50)
 
-        body {{
-            font-family: 'Inter', Arial, sans-serif;
-            color: var(--text-color);
-            background-color: var(--light-bg);
-            line-height: 1.6;
-        }}
+    # Group elements by category for better display
+    categories = {
+        "Typography": ["h1", "h2", "h3", "h4", "h5", "h6", "p", "strong", "em", "small", "mark"],
+        "Lists": ["ul", "ol", "li", "dl", "dt", "dd"],
+        "Tables": ["table", "thead", "tbody", "tr", "th", "td"],
+        "Code": ["pre", "code"],
+        "Media": ["img", "figure", "figcaption"],
+        "Layout": ["div", "section", "article", "main", "aside", "header", "footer"],
+        "Forms": ["form", "fieldset", "legend", "label", "input", "textarea", "select", "button"],
+        "Other": ["blockquote", "a", "hr", "span", "address", "cite", "abbr", "time"]
+    }
 
-        h1, h2, h3, h4, h5, h6 {{
-            font-family: 'Montserrat', Arial, sans-serif;
-            font-weight: 600;
-            margin-top: 1.5rem;
-            margin-bottom: 1rem;
-            color: #333;
-        }}
-
-        h1 {{
-            font-size: 2.5rem;
-            text-align: center;
-            margin-bottom: 2rem;
-        }}
-
-        h2 {{
-            font-size: 1.8rem;
-            border-bottom: 2px solid #f1f1f1;
-            padding-bottom: 0.5rem;
-            margin-top: 2.5rem;
-        }}
-
-        .container {{
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }}
-
-        img {{
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin: 1rem 0;
-        }}
-
-        code {{
-            background-color: #f3f3f3;
-            color: #e74c3c;
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }}
-
-        pre {{
-            background-color: #f8f9fa;
-            padding: 1rem;
-            border-radius: 8px;
-            border: 1px solid #eee;
-            overflow-x: auto;
-        }}
-
-        blockquote {{
-            border-left: 4px solid var(--primary-color);
-            padding: 0.5rem 1rem;
-            background-color: #f9f9f9;
-            margin: 1.5rem 0;
-        }}
-
-        .card {{
-            margin-bottom: 1.5rem;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border: none;
-        }}
-
-        .card-header {{
-            background-color: var(--primary-color);
-            color: white;
-            font-weight: 600;
-            padding: 0.75rem 1.25rem;
-        }}
-
-        .section-title {{
-            text-align: center;
-            margin: 3rem 0 2rem 0;
-            position: relative;
-        }}
-
-        .section-title:after {{
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 3px;
-            background-color: var(--primary-color);
-        }}
-
-        .feature-item {{
-            background-color: var(--card-bg);
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            height: 100%;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }}
-
-        .feature-item:hover {{
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }}
-
-        .feature-icon {{
-            font-size: 2rem;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }}
-
-        .alert {{
-            border-radius: 8px;
-            font-size: 0.95rem;
-        }}
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {{
-            h1 {{
-                font-size: 2rem;
-            }}
-
-            h2 {{
-                font-size: 1.5rem;
-            }}
-        }}
-        <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Documentation</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-</head>
-<body>
-    <div class="container my-5 bg-white p-4 rounded shadow-sm">
-        {content}
-    </div>
-    <script>
-        // Add any custom JavaScript if needed
-        document.addEventListener('DOMContentLoaded', function() {{
-            // Initialize tooltips
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {{
-                return new bootstrap.Tooltip(tooltipTriggerEl)
-            }})
-        }});
-    </script>
-</body>
-</html>"""
-
-
-def generate_odoo_template(title, content):
-    """Generate an Odoo-style HTML template specifically designed for Odoo Apps Store with guaranteed responsive design"""
-    return f"""<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title}</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-</head>
-<body>
-    <div id="wrap" class="oe_structure oe_empty">
-        <section class="oe_container">
-            <div class="oe_row oe_spaced">
-                {content}
-            </div>
-        </section>
-    </div>
-</body>
-</html>"""
+    for category, elements in categories.items():
+        print(f"\n{category}:")
+        print("-" * len(category))
+        for element in elements:
+            if element in DEFAULT_STYLE_CONFIG:
+                attrs = DEFAULT_STYLE_CONFIG[element]
+                print(f"  {element}: {attrs}")
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Convert Markdown files to styled HTML for Odoo modules'
+        description='Convert Markdown files to styled HTML for Odoo modules with comprehensive frontend classes'
     )
     parser.add_argument('file', nargs='?', help='Path to the markdown file (optional)')
     parser.add_argument('--version', action='version',
                         version=f'md2indexhtml {__version__}')
     parser.add_argument('--title', help='Specify a custom title for the HTML document', default="Documentation")
     parser.add_argument('--output', '-o', help='Specify a custom output path for the HTML file')
-    parser.add_argument('--template', '-t',
-                        choices=['modern', 'simple', 'odoo'],
-                        default='odoo',
-                        help='Template style to use (modern, simple, or odoo)')
+    parser.add_argument('--style-config', help='Path to JSON file containing custom style configuration')
+    parser.add_argument('--show-config', action='store_true',
+                        help='Display the default Odoo styling configuration and exit')
 
     args = parser.parse_args()
 
+    # Show default configuration if requested
+    if args.show_config:
+        show_default_config()
+        return
+
     try:
-        convert_md_to_html(args.file, args.title, args.output, args.template)
+        style_config = None
+
+        # Load custom style configuration if provided
+        if args.style_config:
+            style_config = create_style_config_from_file(args.style_config)
+            print(f"Loaded custom style configuration from {args.style_config}")
+
+        convert_md_to_html(
+            md_file_path=args.file,
+            title=args.title,
+            output_path=args.output,
+            style_config=style_config
+        )
     except Exception as e:
         print(f"Error: {str(e)}", file=sys.stderr)
         sys.exit(1)

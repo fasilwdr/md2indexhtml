@@ -4,15 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "md2indexhtml"
-version = "0.3.0"  # Updated version
-description = "Convert Markdown files to index.html for Odoo modules"
+version = "0.5.0"
+description = "Beautiful Markdown to HTML converter with comprehensive Odoo frontend styling"
 readme = "README.md"
 authors = [
     {name = "Fasil", email = "fasilwdr@hotmail.com"}
 ]
 requires-python = ">=3.6"
 license = {text = "MIT"}
-dependencies = ["markdown>=3.0"]  # No longer dynamic
+dependencies = ["markdown>=3.0"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -25,10 +25,11 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-keywords = ["markdown", "html", "odoo", "documentation", "bootstrap"]  # Added bootstrap keyword
+keywords = ["markdown", "html", "odoo", "documentation", "frontend", "styling", "web", "converter"]
 
 [project.urls]
 Homepage = "https://github.com/fasilwdr/md2indexhtml"
