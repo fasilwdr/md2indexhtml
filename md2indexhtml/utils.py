@@ -1,11 +1,140 @@
-# utils.py
+# utils.py - Updated with Comprehensive Odoo Frontend Classes
 
 import re
 import os
 import shutil
+from typing import Dict, Optional
+
+# Comprehensive Odoo styling configuration using classes from web.assets_frontend.min.css
+DEFAULT_STYLE_CONFIG: Dict[str, Dict[str, str]] = {
+    # Typography - Headers
+    "h1": {"class": "display-4 text-center mb32 text-primary font-weight-bold"},
+    "h2": {"class": "h2 mb24 text-secondary font-weight-bold border-bottom pb-2"},
+    "h3": {"class": "h3 mb16 text-primary font-weight-semibold"},
+    "h4": {"class": "h4 mb12 text-dark font-weight-medium"},
+    "h5": {"class": "h5 mb8 text-muted"},
+    "h6": {"class": "h6 mb8 text-muted"},
+
+    # Typography - Text elements
+    "p": {"class": "mb16 text-justify"},
+    "strong": {"class": "font-weight-bold text-dark"},
+    "em": {"class": "font-italic text-muted"},
+    "small": {"class": "small text-muted"},
+    "mark": {"class": "bg-warning text-dark"},
+
+    # Lists
+    "ul": {"class": "mb16 pl-4"},
+    "ol": {"class": "mb16 pl-4"},
+    "li": {"class": "mb8"},
+    "dl": {"class": "mb16"},
+    "dt": {"class": "font-weight-bold mb4"},
+    "dd": {"class": "mb8 ml-4"},
+
+    # Tables
+    "table": {"class": "table table-striped table-hover table-bordered mb16 w-100"},
+    "thead": {"class": "thead-light"},
+    "tbody": {"class": ""},
+    "tr": {"class": ""},
+    "th": {"class": "text-center font-weight-bold bg-light"},
+    "td": {"class": "text-left align-middle"},
+
+    # Code blocks
+    "pre": {"class": "bg-light border rounded p-3 mb16 overflow-auto"},
+    "code": {"class": "bg-light text-danger px-2 py-1 rounded border"},
+
+    # Quote blocks
+    "blockquote": {"class": "blockquote mb16 border-left border-primary pl-3 bg-light p-3 rounded"},
+
+    # Images and media
+    "img": {"class": "img-fluid rounded shadow-sm mb16 d-block mx-auto"},
+    "figure": {"class": "figure mb16 text-center"},
+    "figcaption": {"class": "figure-caption text-muted mt-2"},
+
+    # Links
+    "a": {"class": "text-primary text-decoration-none"},
+
+    # Divisions and containers
+    "div": {"class": "mb16"},
+    "section": {"class": "py-4"},
+    "article": {"class": "mb32"},
+    "main": {"class": "container-fluid"},
+    "aside": {"class": "bg-light p-3 rounded mb16"},
+    "header": {"class": "mb24 pb-3 border-bottom"},
+    "footer": {"class": "mt24 pt-3 border-top text-muted"},
+
+    # Form elements
+    "form": {"class": "mb16"},
+    "fieldset": {"class": "mb16 p-3 border rounded"},
+    "legend": {"class": "font-weight-bold mb16"},
+    "label": {"class": "font-weight-medium mb-2"},
+    "input": {"class": "form-control mb-3"},
+    "textarea": {"class": "form-control mb-3"},
+    "select": {"class": "form-control mb-3"},
+    "button": {"class": "btn btn-primary"},
+
+    # Navigation
+    "nav": {"class": "mb16"},
+    "ul.nav": {"class": "nav nav-pills mb16"},
+    "li.nav-item": {"class": "nav-item"},
+    "a.nav-link": {"class": "nav-link"},
+
+    # Cards and panels
+    "div.card": {"class": "card mb16 shadow-sm"},
+    "div.card-header": {"class": "card-header bg-primary text-white font-weight-bold"},
+    "div.card-body": {"class": "card-body"},
+    "div.card-footer": {"class": "card-footer bg-light text-muted"},
+
+    # Alerts and badges
+    "div.alert": {"class": "alert alert-info mb16"},
+    "span.badge": {"class": "badge badge-secondary"},
+
+    # Media objects
+    "div.media": {"class": "media mb16"},
+    "div.media-object": {"class": "media-object"},
+    "div.media-body": {"class": "media-body"},
+
+    # Grid system helpers
+    "div.container": {"class": "container"},
+    "div.row": {"class": "row"},
+    "div.col": {"class": "col"},
+
+    # Utility classes for common elements
+    "hr": {"class": "my-4 border-top"},
+    "br": {"class": ""},
+    "span": {"class": ""},
+    "address": {"class": "mb16 font-italic"},
+    "cite": {"class": "font-italic text-muted"},
+    "abbr": {"class": "text-decoration-underline"},
+    "time": {"class": "text-muted"},
+
+    # Definition lists
+    "dl.row": {"class": "row mb16"},
+    "dt.col-sm-3": {"class": "col-sm-3 font-weight-bold"},
+    "dd.col-sm-9": {"class": "col-sm-9"},
+
+    # Progress and meters
+    "progress": {"class": "progress mb16"},
+    "meter": {"class": "mb16"},
+
+    # Details and summary
+    "details": {"class": "mb16 border rounded p-3"},
+    "summary": {"class": "font-weight-bold cursor-pointer"},
+
+    # Interactive elements
+    "kbd": {"class": "kbd"},
+    "samp": {"class": "text-monospace bg-light px-1"},
+    "var": {"class": "font-italic text-info"},
+
+    # Semantic HTML5 elements
+    "main": {"class": "main-content"},
+    "section.hero": {"class": "py-5 bg-primary text-white text-center"},
+    "section.features": {"class": "py-4"},
+    "section.testimonials": {"class": "py-4 bg-light"},
+    "section.cta": {"class": "py-5 bg-secondary text-white text-center"},
+}
 
 
-def handle_images(content, md_file_path, output_dir):
+def handle_images(content: str, md_file_path: str, output_dir: str) -> str:
     """
     Process image paths in content and copy images to output directory
     All local images are copied to images/ directory in output_dir
@@ -17,18 +146,18 @@ def handle_images(content, md_file_path, output_dir):
     :return: Updated content with new image paths
     """
 
-    def is_local_path(path):
+    def is_local_path(path: str) -> bool:
         """Check if the path is a local file path"""
         return not (path.startswith(('http://', 'https://', 'data:', '/web/', 'www.')) or
-                    path.startswith('data:image/'))  # Handle base64 images
+                    path.startswith('data:image/'))
 
-    def process_image_path(img_path):
+    def process_image_path(img_path: str) -> str:
         """Process and copy local image if needed"""
         img_path = img_path.strip("'\" ")
 
         # If the path starts with 'static/description/', just remove the prefix and return
         if img_path.startswith('static/description/'):
-            return img_path[18:]  # Remove 'static/description/' prefix
+            return img_path[18:]
 
         # Skip non-local paths and base64 images
         if not is_local_path(img_path):
@@ -55,323 +184,281 @@ def handle_images(content, md_file_path, output_dir):
             target_path = os.path.join(images_dir, filename)
             shutil.copy2(abs_img_path, target_path)
 
-            # Return the new path relative to output directory - without leading slash
-            return f'images/{filename}'  # Removed leading slash
+            return f'images/{filename}'
 
         except Exception as e:
             print(f"Warning: Failed to process image {img_path}: {str(e)}")
             return img_path
 
     # Handle Markdown image syntax
-    def replace_md_image(match):
-        alt_text = match.group(1)
-        img_path = match.group(2)
-
-        # If it's a base64 image, keep it as is
-        if img_path.startswith('data:image/'):
-            return f'<img alt="{alt_text}" src="{img_path}" class="img-fluid"/>'
-
-        # Process other images
-        new_path = process_image_path(img_path)
-        return f'<img alt="{alt_text}" src="{new_path}" class="img-fluid"/>'
+    content = re.sub(r'!\[([^\]]*)\]\(([^)]+)\)',
+                     lambda
+                         m: f'<img alt="{m.group(1)}" src="{process_image_path(m.group(2))}" class="img img-fluid"/>',
+                     content)
 
     # Handle HTML image syntax
-    def replace_html_image(match):
-        quote = match.group(1)  # preserve the original quote type
-        img_path = match.group(2)
-
-        # If it's a base64 image, keep it as is
-        if img_path.startswith('data:image/'):
-            return f'src={quote}{img_path}{quote}'
-
-        # Process other images
-        new_path = process_image_path(img_path)
-        # Make sure the path doesn't start with a slash
-        if new_path.startswith('/'):
-            new_path = new_path[1:]
-        return f'src={quote}{new_path}{quote}'
-
-    # Process Markdown image syntax first
-    content = re.sub(r'!\[([^\]]*)\]\(([^)]+)\)', replace_md_image, content)
-
-    # Then process HTML image tags
-    content = re.sub(r'src=(["\'])(.*?)\1', replace_html_image, content)
-
-    # Add Bootstrap class to all img tags without a class
-    content = re.sub(r'<img(?!\s+class=)([^>]*?)>', r'<img class="img-fluid" \1>', content)
-
-    # Fix any remaining image paths that start with a slash
-    content = re.sub(r'src="/images/', r'src="images/', content)
+    content = re.sub(r'src=(["\'])(.*?)\1',
+                     lambda m: f'src="{process_image_path(m.group(2))}"',
+                     content)
 
     return content
 
 
-def wrap_sections(html_content):
+def wrap_sections_odoo(content: str, title: str) -> str:
     """
-    Wrap HTML content in sections based on h1 and h2 tags
+    Wrap HTML content in Odoo-styled sections based on headings
 
-    :param html_content: HTML content as string
-    :return: Wrapped HTML content
+    :param content: HTML content as string
+    :param title: Title of the document
+    :return: Wrapped HTML content with Odoo styling
     """
+    html_template = f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{title} - Generated by md2indexhtml">
+    <title>{title}</title>
+    <style>
+        /* Ensure Odoo-specific styles are applied */
+        .oe_structure {{ 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #212529;
+        }}
+        .pt32 {{ padding-top: 2rem !important; }}
+        .pb32 {{ padding-bottom: 2rem !important; }}
+        .mb32 {{ margin-bottom: 2rem !important; }}
+        .mb24 {{ margin-bottom: 1.5rem !important; }}
+        .mb16 {{ margin-bottom: 1rem !important; }}
+        .mb12 {{ margin-bottom: 0.75rem !important; }}
+        .mb8 {{ margin-bottom: 0.5rem !important; }}
+        .mb4 {{ margin-bottom: 0.25rem !important; }}
+        .mt24 {{ margin-top: 1.5rem !important; }}
+        .pl-4 {{ padding-left: 1.5rem !important; }}
+        .ml-4 {{ margin-left: 1.5rem !important; }}
+        .font-weight-bold {{ font-weight: 700 !important; }}
+        .font-weight-semibold {{ font-weight: 600 !important; }}
+        .font-weight-medium {{ font-weight: 500 !important; }}
+        .text-justify {{ text-align: justify !important; }}
+    </style>
+</head>
+<body>
+    <div class="oe_structure">
+        {process_headings(content)}
+    </div>
+</body>
+</html>'''
+
+    return html_template
+
+
+def process_headings(content: str) -> str:
+    """
+    Process content and organize it based on heading levels
+
+    :param content: HTML content
+    :return: Processed content with Odoo section structure
+    """
+    # First, extract and preserve any existing <section> tags
+    sections = []
+    raw_html_sections = re.finditer(r'(<section.*?</section>)', content, flags=re.DOTALL)
+    last_end = 0
+
+    for match in raw_html_sections:
+        # Add any content before this section
+        if match.start() > last_end:
+            sections.append(process_markdown_section(content[last_end:match.start()]))
+
+        # Add the raw HTML section as is
+        sections.append(match.group(1))
+        last_end = match.end()
+
+    # Add any remaining content
+    if last_end < len(content):
+        sections.append(process_markdown_section(content[last_end:]))
+
+    return '\n'.join(filter(None, sections))
+
+
+def process_markdown_section(content: str) -> str:
+    """
+    Process markdown content into Odoo-styled sections
+
+    :param content: HTML content from markdown conversion
+    :return: Processed content with Odoo section structure
+    """
+    if not content.strip():
+        return ''
+
     # Split content by h1 tags
-    parts = re.split(r'(<h1.*?</h1>)', html_content, flags=re.DOTALL)
+    h1_parts = re.split(r'(<h1.*?</h1>)', content, flags=re.DOTALL)
+    processed_content = []
 
-    wrapped_content = []
-    for i in range(1, len(parts), 2):
-        if i < len(parts):
-            h1_content = parts[i]
-            following_content = parts[i + 1] if i + 1 < len(parts) else ''
-
-            # Split following content by h2 tags
-            h2_parts = re.split(r'(<h2.*?</h2>)', following_content, flags=re.DOTALL)
+    for i in range(1, len(h1_parts), 2):
+        if i < len(h1_parts):
+            h1_content = h1_parts[i]
+            following_content = h1_parts[i + 1] if i + 1 < len(h1_parts) else ''
 
             # Extract h1 text
             h1_text = re.search(r'>([^<]+)</h1>', h1_content)
             h1_text = h1_text.group(1) if h1_text else ''
 
-            # Create section wrapper
+            # Start new section for h1
             section = f'''
-            <section style="background: linear-gradient(to right, #003554, #52A3AB);border-radius: 20px;max-width: 1200px; margin-bottom: 20px; padding: 20px;margin: 50px auto 20px auto;">
-                <div style="text-align: center;">
-                    <h1 style="color: white; font-size: 2.5em; margin-bottom: 10px;">{h1_text}</h1>
-                </div>
-                <div style="border-radius: 10px;display: flex;flex-wrap: wrap;gap: 20px;padding: 20px;">
+                <section class="pt32 pb32">
+                    <div class="container">
+                        <h1 class="text-center mb32">{h1_text}</h1>
             '''
 
-            # Process h2 sections
-            for j in range(1, len(h2_parts), 2):
-                if j < len(h2_parts):
-                    h2_content = h2_parts[j]
-                    h2_following = h2_parts[j + 1] if j + 1 < len(h2_parts) else ''
-
-                    # Extract h2 text
-                    h2_text = re.search(r'>([^<]+)</h2>', h2_content)
-                    h2_text = h2_text.group(1) if h2_text else ''
-
-                    # Apply styles for markdown content
-                    styled_content = add_markdown_styles(h2_following)
-
-                    section += f'''
-                    <div style="background: #fff;box-shadow: 2px 2px 5px 0px #003554;flex: 1 1 calc(50% - 10px);min-width: 280px;">
-                        <h2 style="color: #fff; text-align:center; background-color: #52A3AB!important; margin: 0; padding: 15px;">{h2_text}</h2>
-                        <div style="padding: 15px;">{styled_content}</div>
+            # Process content immediately after h1 but before any h2
+            h2_split = re.split(r'(<h2.*?</h2>)', following_content, flags=re.DOTALL)
+            if h2_split[0].strip():
+                section += f'''
+                    <div class="mb32">
+                        {process_block_content(h2_split[0])}
                     </div>
-                    '''
+                '''
 
-            section += '''
-                </div>
-            </section>
-            '''
+            # If there are h2 headings, process them
+            if len(h2_split) > 1:
+                # Start row for h2 sections
+                section += '<div class="row d-flex align-items-stretch">'
 
-            wrapped_content.append(section)
-
-    return '\n'.join(wrapped_content)
-
-
-def wrap_sections_bootstrap(html_content):
-    """
-    Wrap HTML content in bootstrap sections based on h1 and h2 tags
-    specifically formatted for Odoo Apps Store compatibility with reliable responsive design
-
-    :param html_content: HTML content as string
-    :return: Wrapped HTML content with Bootstrap styling
-    """
-    # Split content by h1 tags
-    parts = re.split(r'(<h1.*?</h1>)', html_content, flags=re.DOTALL)
-
-    # If no h1 tags are found, wrap the entire content
-    if len(parts) == 1:
-        html_content = add_bootstrap_styles(html_content)
-        return f"""<div class="col-lg-12">
-            {html_content}
-        </div>"""
-
-    wrapped_content = []
-    for i in range(1, len(parts), 2):
-        if i < len(parts):
-            h1_content = parts[i]
-            following_content = parts[i + 1] if i + 1 < len(parts) else ''
-
-            # Extract h1 text
-            h1_text = re.search(r'>([^<]+)</h1>', h1_content)
-            h1_text = h1_text.group(1) if h1_text else ''
-
-            # Create a new section with bootstrap-based h1
-            section = f"""<div class="col-lg-12">
-                <h2 class="text-center mb-4 mt-4" style="color: #875A7B; font-weight: bold;">{h1_text}</h2>
-            """
-
-            # Split following content by h2 tags
-            h2_parts = re.split(r'(<h2.*?</h2>)', following_content, flags=re.DOTALL)
-
-            # If there are no h2 tags, wrap all content in a single section
-            if len(h2_parts) == 1:
-                styled_content = add_bootstrap_styles(following_content)
-                section += f"""<div class="mb-4">
-                    {styled_content}
-                </div>
-                """
-            else:
-                # Process h2 sections for Odoo-style layout
-                for j in range(1, len(h2_parts), 2):
-                    if j < len(h2_parts):
-                        h2_content = h2_parts[j]
-                        h2_following = h2_parts[j + 1] if j + 1 < len(h2_parts) else ''
+                # Process all h2 sections
+                for j in range(1, len(h2_split), 2):
+                    if j < len(h2_split):
+                        h2_content = h2_split[j]
+                        h2_following = h2_split[j + 1] if j + 1 < len(h2_split) else ''
 
                         # Extract h2 text
                         h2_text = re.search(r'>([^<]+)</h2>', h2_content)
                         h2_text = h2_text.group(1) if h2_text else ''
 
-                        # Apply bootstrap styles for markdown content
-                        styled_content = add_bootstrap_styles(h2_following)
+                        # Determine column width based on number of h2 sections
+                        col_class = "col-lg-12" if len(h2_split) == 3 else "col-lg-6"
 
-                        # Create an Odoo-style section with the h2 content
-                        section += f"""<div class="mb-4">
-                            <div class="alert alert-info" style="background-color: #F8F9FA; color: #875A7B; border-color: #875A7B; font-weight:300; font-size:20px; border-radius: 5px;">
-                                <i class="fa fa-hand-point-right"></i><b> {h2_text}</b>
+                        section += f'''
+                            <div class="{col_class} d-flex">
+                                <div class="card w-100 mb16">
+                                    <div class="card-header">
+                                        <h2 class="text-center mb0">{h2_text}</h2>
+                                    </div>
+                                    <div class="card-body">
+                                        {process_block_content(h2_following)}
+                                    </div>
+                                </div>
                             </div>
-                            {styled_content}
-                        </div>
-                        """
+                        '''
 
-            section += """</div>"""
-            wrapped_content.append(section)
+                section += '</div>'  # Close row
 
-    return '\n'.join(wrapped_content)
+            section += '''
+                    </div>
+                </section>
+            '''
 
+            processed_content.append(section)
 
-def add_markdown_styles(content):
-    """Add inline styles to markdown-generated HTML elements"""
-    content = re.sub(r'<h3>', '<h3 style="color: #0A4B75; margin-bottom: 15px;">', content)
-    content = re.sub(r'<p>', '<p style="color: #333; line-height: 1.6;">', content)
-    content = re.sub(r'<ul>', '<ul style="padding-left: 20px; list-style-type: disc;">', content)
-    content = re.sub(r'<li>', '<li style="margin: 5px 0; color: #333;">', content)
-    content = re.sub(r'<code>',
-                     '<code style="background: #f8f9fa; color: #e74c3c; padding: 2px 5px; border-radius: 3px; font-family: Monaco, Menlo, Ubuntu Mono, Consolas, monospace;">',
-                     content)
-    content = re.sub(r'<pre>',
-                     '<pre style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; overflow-x: auto;">',
-                     content)
-    content = re.sub(r'<blockquote>',
-                     '<blockquote style="border-left: 4px solid #52A3AB; padding: 10px 15px; margin: 10px 0; background: #f7f9fc; color: #34495e;">',
-                     content)
-    content = re.sub(r'<a\s', '<a style="color: #52A3AB; text-decoration: none;" ', content)
-    content = re.sub(r'<img\s', '<img style="max-width: 100%; height: auto;" ', content)
-
-    return content
+    return '\n'.join(processed_content)
 
 
-def add_bootstrap_styles(content):
-    """Add Odoo-compatible Bootstrap classes to markdown-generated HTML elements with reliable responsive design"""
-    # Headers - Update h3 to be smaller than h2
-    content = re.sub(r'<h3>', '<h3 class="mt-3 mb-3" style="color:#875A7B; font-weight: bold; font-size: 1.2rem;">', content)
-    content = re.sub(r'<h4>', '<h4 class="mt-3 mb-3" style="color:#875A7B; font-size: 1.1rem;">', content)
+def apply_element_styling(content: str, element: str, attributes: Dict[str, str]) -> str:
+    """
+    Apply multiple attributes to HTML elements using regex
 
-    # Paragraphs
-    content = re.sub(r'<p>', '<p class="text-justify mb-3" style="color: #555;">', content)
+    :param content: HTML content
+    :param element: HTML element name (e.g., 'p', 'div', 'table')
+    :param attributes: Dictionary of attributes to apply {'class': 'mb16', 'id': 'main'}
+    :return: Modified content with applied attributes
+    """
 
-    # Lists
-    content = re.sub(r'<ul>', '<ul class="list-unstyled">', content)
+    def add_attributes(match):
+        tag = match.group(0)
 
-    # Convert feature-like list items to Bootstrap cards
-    if '• ' in content or '✓ ' in content or re.search(r'<li>[^<]*?(?:Feature|Option|Benefit)[^<]*?</li>', content,
-                                                       re.IGNORECASE):
-        # Feature list with Bootstrap column grid for responsiveness
-        content = re.sub(r'<li>([^<]*?)([Ff]eature|[Oo]ption|[Bb]enefit)([^<]*?)</li>',
-                         r'<div class="col-lg-4 col-md-6 mb-4"><div class="card h-100 border-primary"><div class="card-body"><i class="fa fa-check-circle text-primary mr-2"></i><strong>\2</strong>\3</div></div></div>',
-                         content)
+        # Build attributes string
+        attr_strings = []
+        for attr_name, attr_value in attributes.items():
+            # Check if attribute already exists in the tag
+            existing_attr_pattern = rf'{attr_name}=(["\'])([^"\']*?)\1'
+            existing_match = re.search(existing_attr_pattern, tag)
 
-        # Other feature-like items
-        content = re.sub(r'<li>([•✓√] )?([^<]*?)</li>',
-                         r'<div class="col-lg-4 col-md-6 mb-4"><div class="card h-100"><div class="card-body"><i class="fa fa-check text-success mr-2"></i> \2</div></div></div>',
-                         content)
+            if existing_match:
+                # Attribute exists, handle based on type
+                if attr_name == "class":
+                    # For class, append new classes to existing ones
+                    quote = existing_match.group(1)
+                    existing_value = existing_match.group(2)
+                    new_value = f"{existing_value} {attr_value}".strip()
+                    tag = re.sub(existing_attr_pattern, f'{attr_name}={quote}{new_value}{quote}', tag)
+                else:
+                    # For other attributes, replace the value
+                    quote = existing_match.group(1)
+                    tag = re.sub(existing_attr_pattern, f'{attr_name}={quote}{attr_value}{quote}', tag)
+            else:
+                # Attribute doesn't exist, add it
+                attr_strings.append(f'{attr_name}="{attr_value}"')
 
-        # Wrap lists in row
-        content = re.sub(r'<ul class="list-unstyled">(.*?)</ul>', r'<div class="row">\1</div>', content,
-                         flags=re.DOTALL)
-    else:
-        # Regular list items
-        content = re.sub(r'<li>', '<li class="mb-2"><i class="fa fa-check text-success mr-2"></i> ', content)
+        # Add new attributes if any
+        if attr_strings:
+            new_attrs = ' ' + ' '.join(attr_strings)
+            if tag.endswith('>'):
+                tag = tag[:-1] + new_attrs + '>'
+            else:
+                tag = tag + new_attrs
 
-    # Ordered lists
-    content = re.sub(r'<ol>', '<ol class="pl-3 mb-4">', content)
-    content = re.sub(r'<li>([0-9]+\.\s*)', r'<li class="mb-2">\1', content)
+        return tag
 
-    # Code elements
-    content = re.sub(r'<code>', '<code class="bg-light text-danger px-1 rounded" style="font-size: 90%;">', content)
-    content = re.sub(r'<pre>', '<pre class="bg-light p-3 rounded mb-4 border" style="overflow-x: auto;">', content)
+    # Apply to opening tags only
+    pattern = f'<{element}(?:\\s[^>]*)?>'
+    return re.sub(pattern, add_attributes, content)
 
-    # Blockquotes
-    content = re.sub(r'<blockquote>',
-                     '<blockquote class="border-left pl-3 py-2 my-3" style="border-left: 4px solid #875A7B !important; background-color: #f9f9f9;">',
-                     content)
 
-    # Links
-    content = re.sub(r'<a\s', '<a class="text-primary" ', content)
+def process_block_content(
+        content: str,
+        style_config: Optional[Dict[str, Dict[str, str]]] = None
+) -> str:
+    """
+    Process block content and apply configurable styling using dictionary format
 
-    # Handle Markdown image syntax before it's converted to HTML
-    def fix_markdown_images(match):
-        alt_text = match.group(1)
-        img_path = match.group(2)
+    :param content: HTML content block
+    :param style_config: Dictionary configuration for styling elements
+                        Format: {
+                            "element_name": {
+                                "attribute_name": "attribute_value",
+                                "class": "css-classes",
+                                "id": "element-id"
+                            }
+                        }
+                        Example: {
+                            "p": {"class": "mb16"},
+                            "table": {"class": "table table-bordered mb16", "id": "main-table"}
+                        }
+    :return: Processed content with applied styles
+    """
+    # Remove extra whitespace
+    content = content.strip()
 
-        # Remove static/description prefix if it exists
-        if img_path.startswith('static/description/'):
-            img_path = img_path[18:]  # removes 'static/description/'
-        if img_path.startswith('/'):
-            img_path = img_path[1:]  # removes leading slash
+    # Use default configuration if none provided
+    if style_config is None:
+        style_config = DEFAULT_STYLE_CONFIG
 
-        return f'<img class="img-fluid rounded shadow-sm mb-4" alt="{alt_text}" src="{img_path}" />'
+    # Validate configuration format
+    if not isinstance(style_config, dict):
+        raise ValueError("style_config must be a dictionary")
 
-    content = re.sub(r'!\[([^\]]*)\]\(([^)]+)\)', fix_markdown_images, content)
+    # Apply styling for each element in configuration
+    for element, attributes in style_config.items():
+        if not isinstance(attributes, dict):
+            print(f"Warning: Invalid attributes for element '{element}'. Expected dict, got {type(attributes)}")
+            continue
 
-    # Fix already converted HTML image tags
-    def fix_html_image_tags(match):
-        attrs = match.group(1)
+        if not attributes:  # Skip empty attribute dictionaries
+            continue
 
-        # Extract src attribute
-        src_match = re.search(r'src="([^"]+)"', attrs)
-        if src_match:
-            src = src_match.group(1)
-            # Remove static/description prefix if it exists
-            if src.startswith('static/description/'):
-                src = src[18:]  # removes 'static/description/'
-            if src.startswith('/'):
-                src = src[1:]  # removes leading slash
-
-            # Replace src in attrs
-            attrs = re.sub(r'src="[^"]+"', f'src="{src}"', attrs)
-
-        # Handle class attribute
-        if 'class=' in attrs:
-            # Replace existing class
-            attrs = re.sub(r'class="[^"]*"', 'class="img-fluid rounded shadow-sm mb-4"', attrs)
-        else:
-            # Add class if it doesn't exist
-            attrs += ' class="img-fluid rounded shadow-sm mb-4"'
-
-        # Ensure proper tag closing
-        return f'<img {attrs.strip()} />'
-
-    content = re.sub(r'<img([^>]*)>(?!</)', fix_html_image_tags, content)
-    content = re.sub(r'<img([^>]*)/>(?!</)', fix_html_image_tags, content)
-
-    # Make sure images are wrapped properly
-    def wrap_standalone_images(match):
-        img_tag = match.group(0)
-        return f'<div class="text-center mb-4">{img_tag}</div>'
-
-    content = re.sub(r'<img[^>]*?/>', wrap_standalone_images, content)
-
-    # Make tables responsive with Bootstrap
-    content = re.sub(r'<table>', '<div class="table-responsive mb-4"><table class="table table-bordered table-hover">',
-                     content)
-    content = re.sub(r'</table>', '</table></div>', content)
-    content = re.sub(r'<thead>', '<thead class="thead-light">', content)
-
-    # Ensure buttons use Bootstrap classes
-    content = re.sub(r'<button', r'<button class="btn btn-primary"', content)
-
-    # Add Bootstrap classes to any tables
-    content = re.sub(r'<table', r'<table class="table table-bordered table-hover"', content)
+        try:
+            content = apply_element_styling(content, element, attributes)
+        except Exception as e:
+            print(f"Warning: Failed to apply styling to element '{element}': {str(e)}")
 
     return content

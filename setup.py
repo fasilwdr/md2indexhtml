@@ -5,8 +5,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='md2indexhtml',
-    version='0.3.0',  # Updated version
-    description='Convert Markdown files to index.html for Odoo modules',
+    version='0.5.0',
+    description='Beautiful Markdown to HTML converter with comprehensive Odoo frontend styling',
     long_description=long_description,
     long_description_content_type='text/markdown',
     author='Fasil',
@@ -28,10 +28,11 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
     ],
-    keywords='markdown, html, odoo, documentation, bootstrap',  # Added bootstrap keyword
+    keywords='markdown, html, odoo, documentation, frontend, styling, web, converter',
     python_requires='>=3.6',
     entry_points={
         'console_scripts': [
