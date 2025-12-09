@@ -1,5 +1,7 @@
 # md2indexhtml
 
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/md2indexhtml?period=total&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/md2indexhtml)
+
 `md2indexhtml` is a powerful Python package that converts Markdown files to beautifully styled HTML pages specifically designed for Odoo modules. It uses comprehensive Odoo frontend styling classes from `web.assets_frontend.min.css` to create professional, responsive documentation that integrates seamlessly with Odoo's design system.
 
 <div align="center">
@@ -27,14 +29,14 @@
 ## Features
 
 - **Comprehensive Odoo Styling**: Uses authentic Odoo frontend classes for consistent design
-- **Dictionary-Based Configuration**: Flexible styling system using JSON configuration files
+- **Enhanced Premium Design**: Modern typography (Inter font), soft shadows, and clean card layouts by default
 - **Semantic HTML5**: Generates clean, accessible HTML with proper semantic structure
 - **Automatic Image Handling**: Processes and copies images with responsive styling
-- **Custom Style Configurations**: Override default styling with custom JSON configurations
+- **Custom Resource Injection**: Easily inject custom CSS stylesheets and JavaScript files
 - **CLI Integration**: Simple command-line interface with powerful options
 - **Responsive Design**: Mobile-friendly layouts with Odoo's responsive classes
-- **Typography Excellence**: Beautiful typography using Odoo's font system
-- **Card-Based Layouts**: Automatic section organization into elegant card layouts
+- **Typography Excellence**: Beautiful typography using Odoo's font system alongside Google's Inter font
+- **Card-Based Layouts**: Automatic section organization into elegant card layouts with hover effects
 - **Table Enhancement**: Professional table styling with striped rows and hover effects
 
 ## Installation
@@ -88,102 +90,19 @@ Set a custom title for your HTML document:
 md2indexhtml README.md --title "Module Documentation"
 ```
 
-### Custom Style Configuration
+### Inject Custom Styles or Scripts
 
-Create a JSON file with your custom styling preferences:
+You can inject custom CSS or JavaScript files into the generated HTML. This is useful for adding google analytics, custom fonts, or specific styling tweaks.
 
-```json
-{
-  "h1": {
-    "class": "display-2 text-primary text-center mb-5",
-    "style": "border-bottom: 3px solid #875A7B;"
-  },
-  "p": {
-    "class": "lead text-muted mb-4"
-  },
-  "table": {
-    "class": "table table-dark table-striped table-hover"
-  }
-}
-```
-
-Then apply it:
-
+**Add Custom Stylesheet:**
 ```bash
-md2indexhtml README.md --style-config my-styles.json
+md2indexhtml README.md --stylesheet "https://fonts.googleapis.com/css?family=Open+Sans,custom.css"
 ```
 
-### View Default Configuration
-
-See all available styling options:
-
+**Add Custom Script:**
 ```bash
-md2indexhtml --show-config
+md2indexhtml README.md --script "https://example.com/analytics.js,custom_script.js"
 ```
-
-This displays the complete default Odoo styling configuration organized by categories.
-
-## Configuration System
-
-### Default Odoo Styling
-
-The package comes with comprehensive default styling that covers:
-
-- **Typography**: Headers (h1-h6), paragraphs, emphasis, code blocks
-- **Lists**: Unordered, ordered, and definition lists
-- **Tables**: Full table styling with headers, borders, and hover effects
-- **Forms**: Input fields, buttons, fieldsets with Odoo styling
-- **Layout**: Containers, sections, cards, and grid systems
-- **Media**: Images, figures, and responsive media elements
-- **Navigation**: Navigation bars, breadcrumbs, and links
-- **Interactive**: Alerts, badges, progress bars, and tooltips
-
-### Custom Configuration Format
-
-Style configurations use a simple dictionary format:
-
-```python
-{
-    "element_name": {
-        "attribute_name": "attribute_value",
-        "class": "css-classes",
-        "id": "element-id",
-        "style": "inline-css"
-    }
-}
-```
-
-**Examples:**
-
-```json
-{
-  "h2": {
-    "class": "text-center text-primary mb-4",
-    "style": "border-bottom: 2px solid #875A7B;"
-  },
-  "blockquote": {
-    "class": "alert alert-info border-left-primary",
-    "style": "border-left: 4px solid #17a2b8;"
-  },
-  "img": {
-    "class": "img-fluid rounded shadow-lg mb-4 d-block mx-auto",
-    "style": "max-height: 400px;"
-  }
-}
-```
-
-### Styling Categories
-
-The default configuration includes styling for:
-
-1. **Typography Elements**: h1-h6, p, strong, em, small, mark
-2. **List Elements**: ul, ol, li, dl, dt, dd
-3. **Table Elements**: table, thead, tbody, tr, th, td
-4. **Code Elements**: pre, code
-5. **Media Elements**: img, figure, figcaption
-6. **Layout Elements**: div, section, article, main, aside, header, footer
-7. **Form Elements**: form, input, textarea, select, button, fieldset, legend
-8. **Interactive Elements**: a, nav, details, summary
 
 ## Content Structure
 
@@ -209,15 +128,6 @@ You can mix HTML directly in your markdown:
     <h2>Custom HTML Section</h2>
     <p>This will be preserved exactly as written</p>
 </section>
-
-## Features
-
-- Feature 1
-- Feature 2
-
-<div class="alert alert-warning">
-    <strong>Note:</strong> Important information here
-</div>
 ```
 
 ### Image Handling
@@ -237,7 +147,6 @@ The package automatically processes images:
 - Updates paths to use only filenames (flattens directory structure)
 - Adds responsive classes automatically
 - Preserves external URLs and base64 images
-- Warns about missing images but continues processing
 
 ## Python API
 
@@ -249,24 +158,19 @@ from md2indexhtml import convert_md_to_html
 # Basic conversion
 convert_md_to_html("README.md")
 
-# With custom configuration
-style_config = {
-    "h1": {"class": "display-1 text-center text-primary"},
-    "p": {"class": "lead mb-4"}
-}
-
+# With custom custom title and output
 convert_md_to_html(
     md_file_path="README.md",
     title="My Documentation",
-    output_path="docs/index.html",
-    style_config=style_config
+    output_path="docs/index.html"
 )
 
-# Load configuration from file
-from md2indexhtml.converter import create_style_config_from_file
-
-config = create_style_config_from_file("styles.json")
-convert_md_to_html("README.md", style_config=config)
+# With custom stylesheets and scripts
+convert_md_to_html(
+    md_file_path="README.md",
+    stylesheets=["https://example.com/style.css", "custom.css"],
+    scripts=["https://example.com/script.js"]
+)
 ```
 
 ## Output Features
@@ -298,68 +202,11 @@ md2indexhtml README.md
 # Custom title and output
 md2indexhtml README.md --title "My Module" --output custom.html
 
-# Apply custom styling
-md2indexhtml README.md --style-config custom-styles.json
-
-# View default configuration
-md2indexhtml --show-config
+# Inject Custom resources
+md2indexhtml README.md --stylesheet "style.css" --script "app.js"
 
 # Get version
 md2indexhtml --version
-```
-
-## Examples
-
-### Basic Module Documentation
-
-```markdown
-# Inventory Management Pro
-
-Advanced inventory management for Odoo with real-time tracking.
-
-## Key Features
-
-- Real-time stock tracking
-- Automated reorder points
-- Advanced reporting dashboard
-- Mobile-friendly interface
-
-## Installation
-
-1. Download the module
-2. Install in your Odoo instance
-3. Configure your settings
-
-## Screenshots
-
-![Dashboard](screenshots/dashboard.png)
-![Reports](screenshots/reports.png)
-```
-
-### Custom Styling Example
-
-Create `custom-style.json`:
-
-```json
-{
-  "h1": {
-    "class": "display-3 text-center text-primary mb-5",
-    "style": "text-shadow: 2px 2px 4px rgba(0,0,0,0.1);"
-  },
-  "h2": {
-    "class": "h3 text-secondary mb-3 border-bottom border-primary pb-2"
-  },
-  "img": {
-    "class": "img-fluid rounded-lg shadow-lg mb-4 d-block mx-auto",
-    "style": "border: 3px solid #875A7B;"
-  }
-}
-```
-
-Apply it:
-
-```bash
-md2indexhtml README.md --style-config custom-style.json
 ```
 
 ## Contributing
