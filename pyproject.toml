@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "md2indexhtml"
-version = "0.6.0"
-description = "Beautiful Markdown to HTML converter with comprehensive Odoo frontend styling"
+version = "0.7.0"
+description = "Section-type-aware Markdown to HTML converter for Odoo module pages"
 readme = "README.md"
 authors = [
     {name = "Fasil", email = "fasilwdr@hotmail.com"}

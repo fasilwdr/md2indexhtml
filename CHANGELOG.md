@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-05-05
+
+### Added
+- **Section-type detection** — each `---`-separated block is automatically identified
+  from its `## heading` (overview, features, installation, configuration, screenshots,
+  usage, known_issues, faq, changelog, generic) and rendered with an appropriate layout
+- **Per-section-type style customisation** via a JSON config file (`--style-config`) or
+  the new `style_config` parameter in the Python API
+- **Nine layout renderers**: card grid (overview, features, usage), centred steps
+  (installation, configuration), image gallery (screenshots), alert box (known_issues),
+  Q&A list (faq), version cards (changelog), plain content (generic)
+- `SECTION_TYPE_KEYWORDS` and `DEFAULT_SECTION_STYLES` are now exported from the
+  package for programmatic inspection and extension
+- Section continuation: `---` blocks with no `##` heading inherit the previous section
+  type, enabling multi-block FAQ and Usage sections
+
+### Changed
+- **BREAKING**: `utils.py` completely rewritten — removed the large `DEFAULT_STYLE_CONFIG`
+  element-level dict; replaced with `DEFAULT_SECTION_STYLES` (per-section-type classes)
+- **BREAKING**: old `process_headings`, `process_markdown_section`,
+  `apply_element_styling`, `process_block_content`, and `wrap_sections_odoo` functions
+  removed from `utils.py` (a compatibility alias for `wrap_sections_odoo` is kept)
+- `converter.py` rewritten to use the new section-detection pipeline
+- HTML document now uses a lightweight self-contained CSS reset + grid (no Bootstrap CDN
+  dependency) making it fully standalone and Odoo Apps Store sanitizer-safe
+- Fixed image-path off-by-one bug: `static/description/` prefix (19 chars) is now
+  correctly stripped instead of only 18 chars
+
+### Removed
+- `DEFAULT_STYLE_CONFIG` (replaced by `DEFAULT_SECTION_STYLES`)
+- `process_headings`, `process_markdown_section`, `apply_element_styling`,
+  `process_block_content` helper functions
+
 ## [0.6.0] - 2025-12-09
 
 ### Added
